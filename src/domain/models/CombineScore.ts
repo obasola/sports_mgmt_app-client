@@ -1,13 +1,13 @@
+import { Player } from "./Player"
 
-// src/core/domain/models/CombineScore.ts
 export interface CombineScore {
-  id?: number;
-  playerId: number;
-  fortyYardDash: number;
-  benchPress: number;
-  verticalJump: number;
-  broadJump: number;
-  threeCone: number;
-  shuttleRun: number;
-  year: number;
+  id?: number
+  fortyTime: number
+  tenYardSplit: number
+  verticalLeap: number
+  broadJump: number
+  threeCone: number
+  twentyYardShuttle: number
+  playerId: number
+  player?: Player
 }

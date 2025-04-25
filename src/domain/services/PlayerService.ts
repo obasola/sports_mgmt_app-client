@@ -1,36 +1,79 @@
+// src/domain/services/PlayerService.ts
+import { IPlayerRepository } from '@/repositories/interfaces'
+import { PlayerRepository } from '@/repositories/PlayerRepository'
+import { BaseService } from './BaseService'
+import type { Player } from '@/domain/models/Player'
+import { DuplicateEntityError } from './errors/DuplicateEntityError'
 
-import type { IPlayerService } from '@/domain/services/interfaces/IPlayerService';
-import type { IPlayerRepository } from '../repositories/interfaces/IPlayerRepository';
-import type { Player } from '@/domain/models/Player';
-
-export class PlayerService implements IPlayerService {
-  private playerRepository: IPlayerRepository;
-
-  constructor(playerRepository: IPlayerRepository) {
-    this.playerRepository = playerRepository;
+export class PlayerService extends BaseService<Player, IPlayerRepository> {
+  constructor(repository: IPlayerRepository = new PlayerRepository()) {
+    super(repository)
   }
 
-  async getAllPlayers(): Promise<Player[]> {
-    return this.playerRepository.findAll();
+  /**
+   * Get players by team ID
+   */
+  async getByTeamId(teamId: number): Promise<Player[]> {
+    return this.repository.getByTeamId(teamId)
   }
 
-  async getPlayerById(id: number): Promise<Player> {
-    return this.playerRepository.findById(id);
+  /**
+   * Create a new player with duplicate checking
+   * If a duplicate exists, throws a DuplicateEntityError
+   */
+  async create(player: Player): Promise<Player> {
+    // Check for duplicates
+    const existingPlayer = await this.repository.findDuplicate(
+      player.firstName,
+      player.lastName,
+      player.university
+    )
+
+    if (existingPlayer) {
+      throw new DuplicateEntityError(
+        `A player named ${player.firstName} ${player.lastName} from ${player.university} already exists`,
+        'Player',
+        existingPlayer.id
+      )
+    }
+
+    return this.repository.create(player)
   }
 
-  async searchPlayersByName(firstName: string, lastName: string): Promise<Player[]> {
-    return this.playerRepository.findByName(firstName, lastName);
+  /**
+   * Update player with duplicate checking
+   */
+  async update(id: number, player: Player): Promise<Player> {
+    // Check for duplicates (excluding the current player)
+    const existingPlayer = await this.repository.findDuplicate(
+      player.firstName,
+      player.lastName,
+      player.university
+    )
+
+    if (existingPlayer && existingPlayer.id !== id) {
+      throw new DuplicateEntityError(
+        `Another player named ${player.firstName} ${player.lastName} from ${player.university} already exists`,
+        'Player',
+        existingPlayer.id
+      )
+    }
+
+    return this.repository.update(id, player)
   }
 
-  async createPlayer(player: Player): Promise<Player> {
-    return this.playerRepository.create(player);
-  }
-
-  async updatePlayer(id: number, player: Player): Promise<Player> {
-    return this.playerRepository.update(id, player);
-  }
-
-  async deletePlayer(id: number | undefined): Promise<boolean> {
-    return this.playerRepository.delete(id);
+  /**
+   * Create or update player (handles duplicates automatically)
+   * If a duplicate exists, it updates the existing player
+   */
+  async createOrUpdate(player: Player): Promise<Player> {
+    try {
+      return await this.create(player)
+    } catch (error) {
+      if (error instanceof DuplicateEntityError && error.existingId) {
+        return this.repository.update(error.existingId, player)
+      }
+      throw error
+    }
   }
 }

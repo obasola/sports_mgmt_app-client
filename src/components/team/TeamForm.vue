@@ -1,271 +1,215 @@
-<!-- src/components/team/TeamForm.vue -->
 <template>
   <div class="team-form">
-    <form @submit.prevent="submitForm">
-      <div class="p-fluid">
-        <div class="p-field mb-3">
-          <span class="p-float-label">
+    <form @submit.prevent="saveTeam">
+      <div class="p-fluid form-grid">
+        <div class="form-section">
+          <h3>Team Information</h3>
+          <div class="p-field">
+            <label for="name">Team Name</label>
             <InputText
               id="name"
-              v-model.trim="team.name"
-              :class="{ 'p-invalid': v$.name.$invalid && v$.name.$dirty }"
+              v-model.trim="formData.name"
+              :class="{ 'p-invalid': submitted && !formData.name }"
               required
             />
-            <label for="name">Team Name*</label>
-          </span>
-          <small class="p-error" v-if="v$.name.$invalid && v$.name.$dirty">
-            {{ v$.name.$errors[0].$message }}
-          </small>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputText
-                id="city"
-                v-model.trim="team.city"
-                :class="{ 'p-invalid': v$.city.$invalid && v$.city.$dirty }"
-                required
-              />
-              <label for="city">City*</label>
-            </span>
-            <small class="p-error" v-if="v$.city.$invalid && v$.city.$dirty">
-              {{ v$.city.$errors[0].$message }}
-            </small>
+            <small v-if="submitted && !formData.name" class="p-error">Team name is required</small>
           </div>
 
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputText
-                id="state"
-                v-model.trim="team.state"
-                :class="{ 'p-invalid': v$.state.$invalid && v$.state.$dirty }"
-                required
-              />
-              <label for="state">State*</label>
-            </span>
-            <small class="p-error" v-if="v$.state.$invalid && v$.state.$dirty">
-              {{ v$.state.$errors[0].$message }}
-            </small>
-          </div>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <Dropdown
-                id="conference"
-                v-model="team.conference"
-                :options="conferenceOptions"
-                :class="{ 'p-invalid': v$.conference.$invalid && v$.conference.$dirty }"
-                required
-              />
-              <label for="conference">Conference*</label>
-            </span>
-            <small class="p-error" v-if="v$.conference.$invalid && v$.conference.$dirty">
-              {{ v$.conference.$errors[0].$message }}
-            </small>
+          <div class="p-field">
+            <label for="city">City</label>
+            <InputText
+              id="city"
+              v-model.trim="formData.city"
+              :class="{ 'p-invalid': submitted && !formData.city }"
+              required
+            />
+            <small v-if="submitted && !formData.city" class="p-error">City is required</small>
           </div>
 
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <Dropdown
-                id="division"
-                v-model="team.division"
-                :options="divisionOptions"
-                :class="{ 'p-invalid': v$.division.$invalid && v$.division.$dirty }"
-                required
-              />
-              <label for="division">Division*</label>
-            </span>
-            <small class="p-error" v-if="v$.division.$invalid && v$.division.$dirty">
-              {{ v$.division.$errors[0].$message }}
-            </small>
+          <div class="p-field">
+            <label for="state">State</label>
+            <InputText
+              id="state"
+              v-model.trim="formData.state"
+              :class="{ 'p-invalid': submitted && !formData.state }"
+              required
+            />
+            <small v-if="submitted && !formData.state" class="p-error">State is required</small>
           </div>
-        </div>
 
-        <div class="p-field mb-3">
-          <span class="p-float-label">
+          <div class="p-field">
+            <label for="stadium">Stadium</label>
             <InputText
               id="stadium"
-              v-model.trim="team.stadium"
-              :class="{ 'p-invalid': v$.stadium.$invalid && v$.stadium.$dirty }"
+              v-model.trim="formData.stadium"
+              :class="{ 'p-invalid': submitted && !formData.stadium }"
               required
             />
-            <label for="stadium">Stadium Name*</label>
-          </span>
-          <small class="p-error" v-if="v$.stadium.$invalid && v$.stadium.$dirty">
-            {{ v$.stadium.$errors[0].$message }}
-          </small>
-        </div>
-
-        <div class="p-field mb-3">
-          <span class="p-float-label">
-            <InputNumber
-              id="scheduleId"
-              v-model="team.scheduleId"
-              :class="{ 'p-invalid': v$.scheduleId.$invalid && v$.scheduleId.$dirty }"
-              required
-            />
-            <label for="scheduleId">Schedule ID*</label>
-          </span>
-          <small class="p-error" v-if="v$.scheduleId.$invalid && v$.scheduleId.$dirty">
-            {{ v$.scheduleId.$errors[0].$message }}
-          </small>
-        </div>
-
-        <div class="formgrid grid mt-4">
-          <div class="field col-12">
-            <Button
-              type="submit"
-              :label="isEditMode ? 'Update Team' : 'Create Team'"
-              class="p-button-primary mr-2"
-              :loading="submitting"
-            />
-            <Button
-              type="button"
-              label="Cancel"
-              class="p-button-secondary"
-              @click="cancelForm"
-              :disabled="submitting"
-            />
+            <small v-if="submitted && !formData.stadium" class="p-error">Stadium is required</small>
           </div>
         </div>
+
+        <div class="form-section">
+          <h3>League Information</h3>
+          <div class="p-field">
+            <label for="conference">Conference</label>
+            <Dropdown
+              id="conference"
+              v-model="formData.conference"
+              :options="conferenceOptions"
+              :class="{ 'p-invalid': submitted && !formData.conference }"
+              placeholder="Select a conference"
+              required
+            />
+            <small v-if="submitted && !formData.conference" class="p-error"
+              >Conference is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="division">Division</label>
+            <Dropdown
+              id="division"
+              v-model="formData.division"
+              :options="divisionOptions"
+              :class="{ 'p-invalid': submitted && !formData.division }"
+              placeholder="Select a division"
+              required
+            />
+            <small v-if="submitted && !formData.division" class="p-error"
+              >Division is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="scheduleId">Schedule ID</label>
+            <InputNumber
+              id="scheduleId"
+              v-model="formData.scheduleId"
+              :min="0"
+              :class="{ 'p-invalid': submitted && formData.scheduleId === undefined }"
+              required
+            />
+            <small v-if="submitted && formData.scheduleId === undefined" class="p-error"
+              >Schedule ID is required</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="$emit('cancel')"
+          type="button"
+        />
+        <Button label="Save" icon="pi pi-check" class="p-button-success" type="submit" />
       </div>
     </form>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, computed, reactive, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useVuelidate } from '@vuelidate/core';
-import { required, minValue, minLength } from '@vuelidate/validators';
-import { useTeamStore } from '../../infrastructure/store/team.store';
-import { useToast } from 'primevue/usetoast';
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
-import Dropdown from 'primevue/dropdown';
-import Button from 'primevue/button';
-import type { Team } from '../../domain/models/Team';
+<script setup lang="ts">
+import { ref, reactive } from 'vue'
+import type { Team } from '@/domain/models/Team'
+import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
+import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
 
-// Props
-const props = defineProps({
-  teamId: {
-    type: [Number, String],
-    default: null
-  },
-  isEditMode: {
-    type: Boolean,
-    default: false
-  }
-});
+const props = defineProps<{
+  team?: Team
+}>()
 
-// Emit events
-const emit = defineEmits(['saved', 'cancelled']);
+const emit = defineEmits(['save', 'cancel'])
 
-// Store and router
-const teamStore = useTeamStore();
-const router = useRouter();
-const toast = useToast();
+const submitted = ref(false)
 
-// State
-const submitting = ref(false);
-const team = reactive<Team>({
-  name: '',
-  city: '',
-  state: '',
-  conference: '',
-  division: '',
-  stadium: '',
-  scheduleId: 0
-});
+const conferenceOptions = ['AFC', 'NFC']
+const divisionOptions = ['North', 'South', 'East', 'West']
 
-// Options
-const conferenceOptions = ['AFC', 'NFC'];
-const divisionOptions = ['North', 'South', 'East', 'West'];
+// Create reactive form data with default values
+const formData = reactive<Team>({
+  id: props.team?.id,
+  name: props.team?.name || '',
+  city: props.team?.city || '',
+  state: props.team?.state || '',
+  country: props.team?.country || '',
+  conference: props.team?.conference || '',
+  division: props.team?.division || '',
+  stadium: props.team?.stadium || '',
+  scheduleId: props.team?.scheduleId || 0,
+  
+})
 
-// Validation rules
-const rules = {
-  name: { required, minLength: minLength(2) },
-  city: { required, minLength: minLength(2) },
-  state: { required, minLength: minLength(2) },
-  conference: { required },
-  division: { required },
-  stadium: { required, minLength: minLength(2) },
-  scheduleId: { required, minValue: minValue(1) }
-};
+const saveTeam = () => {
+  submitted.value = true
 
-const v$ = useVuelidate(rules, team);
-
-// Methods
-const loadTeam = async (id: number) => {
-  try {
-    await teamStore.fetchTeamById(id);
-    const loadedTeam = teamStore.currentTeam;
-
-    if (loadedTeam) {
-      // Copy team data to our reactive object
-      Object.assign(team, loadedTeam);
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Team not found', life: 3000 });
-      router.push({ name: 'Teams' });
-    }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load team', life: 3000 });
-    router.push({ name: 'Teams' });
-  }
-};
-
-const submitForm = async () => {
-  const isValid = await v$.value.$validate();
-
-  if (!isValid) {
-    toast.add({ severity: 'error', summary: 'Validation Error', detail: 'Please correct the form errors', life: 3000 });
-    return;
+  // Validate required fields
+  if (
+    !formData.name ||
+    !formData.city ||
+    !formData.state ||
+    !formData.conference ||
+    !formData.division ||
+    !formData.stadium ||
+    formData.scheduleId === undefined
+  ) {
+    return
   }
 
-  submitting.value = true;
-
-  try {
-    if (props.isEditMode && props.teamId) {
-      await teamStore.updateTeam(Number(props.teamId), team);
-      toast.add({ severity: 'success', summary: 'Success', detail: 'Team updated successfully', life: 3000 });
-    } else {
-      await teamStore.createTeam(team);
-      toast.add({ severity: 'success', summary: 'Success', detail: 'Team created successfully', life: 3000 });
-    }
-
-    emit('saved');
-    router.push({ name: 'Teams' });
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: props.isEditMode ? 'Failed to update team' : 'Failed to create team',
-      life: 3000
-    });
-  } finally {
-    submitting.value = false;
-  }
-};
-
-const cancelForm = () => {
-  emit('cancelled');
-  router.push({ name: 'Teams' });
-};
-
-// Lifecycle hooks
-onMounted(async () => {
-  if (props.isEditMode && props.teamId) {
-    await loadTeam(Number(props.teamId));
-  }
-});
+  // Emit save event with form data
+  emit('save', { ...formData })
+}
 </script>
 
 <style scoped>
 .team-form {
-  max-width: 800px;
-  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--primary-text);
+  border-bottom: 1px solid var(--primary-text);
+  padding-bottom: 0.5rem;
+}
+
+.p-field {
+  margin-bottom: 1rem;
+}
+
+.p-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

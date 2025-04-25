@@ -1,4 +1,3 @@
-<!-- src/components/player/PlayerList.vue -->
 <template>
   <div class="player-list">
     <DataTable
@@ -6,189 +5,273 @@
       :paginator="true"
       :rows="10"
       :rowsPerPageOptions="[5, 10, 25, 50]"
-      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} players"
-      responsiveLayout="scroll"
-      stripedRows
-      class="p-datatable-sm"
       v-model:filters="filters"
       filterDisplay="menu"
       :loading="loading"
+      responsiveLayout="scroll"
       :globalFilterFields="['firstName', 'lastName', 'position', 'university']"
+      class="p-datatable-players"
     >
       <template #header>
-        <div class="flex justify-content-between align-items-center">
-          <h2 class="m-0">Players</h2>
-          <div class="flex align-items-center">
-            <span class="p-input-icon-left mr-2">
-              <i class="pi pi-search" />
-              <InputText
-                v-model="filters['global'].value"
-                placeholder="Search..."
-                class="p-inputtext-sm"
-              />
-            </span>
-            <Button
-              label="New Player"
-              icon="pi pi-plus"
-              class="p-button-sm"
-              @click="navigateToCreate"
-            />
-          </div>
+        <div class="table-header">
+          <h2>Players</h2>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search" />
+            <InputText v-model="filters['global'].value" placeholder="Search..." />
+          </span>
+          <Button
+            label="Add Player"
+            icon="pi pi-plus"
+            class="p-button-success ml-2"
+            @click="$emit('create')"
+          />
         </div>
       </template>
 
-      <Column field="id" header="ID" sortable></Column>
-      <Column field="firstName" header="First Name" sortable>
-        <template #filter="{ filterModel, filterCallback }">
-          <InputText
-            v-model="filterModel.value"
-            type="text"
-            class="p-column-filter"
-            placeholder="Search by first name"
-            @input="filterCallback()"
-          />
+      <template #empty>
+        <div class="text-center p-4">No players found.</div>
+      </template>
+
+      <template #loading>
+        <div class="text-center p-4">Loading players...</div>
+      </template>
+
+      <Column field="id" header="ID" sortable style="width: 5%"></Column>
+      <Column field="lastName" header="Last Name" sortable style="width: 15%">
+        <template #body="{ data }">
+          {{ data.lastName }}
         </template>
-      </Column>
-      <Column field="lastName" header="Last Name" sortable>
         <template #filter="{ filterModel, filterCallback }">
           <InputText
             v-model="filterModel.value"
             type="text"
+            @keydown.enter="filterCallback()"
             class="p-column-filter"
             placeholder="Search by last name"
-            @input="filterCallback()"
           />
         </template>
       </Column>
-      <Column field="position" header="Position" sortable>
+      <Column field="firstName" header="First Name" sortable style="width: 15%">
+        <template #body="{ data }">
+          {{ data.firstName }}
+        </template>
+      </Column>
+      <Column field="position" header="Position" sortable style="width: 10%">
+        <template #body="{ data }">
+          {{ data.position }}
+        </template>
         <template #filter="{ filterModel, filterCallback }">
           <Dropdown
             v-model="filterModel.value"
-            :options="positionOptions"
-            placeholder="Any Position"
-            class="p-column-filter"
             @change="filterCallback()"
+            :options="positionOptions"
+            placeholder="Select a position"
+            class="p-column-filter"
+            showClear
           />
         </template>
       </Column>
-      <Column field="university" header="University" sortable></Column>
-      <Column field="yearEnteredLeague" header="Year Entered" sortable></Column>
-      <Column header="Actions">
-        <template #body="slotProps">
-          <div class="flex gap-2">
+      <Column field="team.name" header="Team" sortable style="width: 15%">
+        <template #body="{ data }">
+          {{ data.team?.name || 'N/A' }}
+        </template>
+      </Column>
+      <Column field="age" header="Age" sortable style="width: 5%"></Column>
+      <Column field="university" header="University" sortable style="width: 15%">
+        <template #body="{ data }">
+          {{ data.university }}
+        </template>
+      </Column>
+      <Column field="yearEnteredLeague" header="Year" sortable style="width: 10%">
+        <template #body="{ data }">
+          {{ formatYearOnly(data.yearEnteredLeague) }}
+        </template>
+        <template #filter="{ filterModel, filterCallback }">
+          <Calendar
+            v-model="filterModel.value"
+            view="year"
+            dateFormat="yy"
+            @date-select="filterCallback()"
+            placeholder="Select Year"
+            class="p-column-filter"
+          />
+        </template>
+      </Column>
+      <Column header="Actions" style="width: 10%">
+        <template #body="{ data }">
+          <div class="action-buttons">
             <Button
               icon="pi pi-eye"
-              class="p-button-rounded p-button-info p-button-sm"
-              @click="viewDetails(slotProps.data)"
+              class="p-button-text p-button-rounded p-button-info"
+              @click="$emit('view', data.id)"
+              v-tooltip.top="'View'"
             />
             <Button
               icon="pi pi-pencil"
-              class="p-button-rounded p-button-success p-button-sm"
-              @click="editPlayer(slotProps.data)"
+              class="p-button-text p-button-rounded p-button-success"
+              @click="editPlayer(data.id)"
+              v-tooltip.top="'Edit'"
             />
             <Button
               icon="pi pi-trash"
-              class="p-button-rounded p-button-danger p-button-sm"
-              @click="confirmDelete(slotProps.data)"
+              class="p-button-text p-button-rounded p-button-danger"
+              @click="confirmDelete(data)"
+              v-tooltip.top="'Delete'"
             />
           </div>
         </template>
       </Column>
     </DataTable>
+
+    <Dialog
+      v-model:visible="deleteDialog"
+      :style="{ width: '450px' }"
+      header="Confirm"
+      :modal="true"
+    >
+      <div class="confirmation-content">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
+        <span v-if="playerToDelete">
+          Are you sure you want to delete
+          <b>{{ playerToDelete.firstName }} {{ playerToDelete.lastName }}</b
+          >?
+        </span>
+      </div>
+      <template #footer>
+        <Button label="No" icon="pi pi-times" class="p-button-text" @click="closeDeleteDialog" />
+        <Button label="Yes" icon="pi pi-check" class="p-button-text" @click="deletePlayer" />
+      </template>
+    </Dialog>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { usePlayerStore } from '../../infrastructure/store/player.store';
-import { FilterMatchMode } from '@primevue/core/api';
-import { useConfirm } from 'primevue/useconfirm';
-import { useToast } from 'primevue/usetoast';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
-import type { Player } from '@/domain/models';
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import { usePlayerStore } from '@/stores/player'
 
-// Store and router
-const playerStore = usePlayerStore();
-const router = useRouter();
-const confirm = useConfirm();
-const toast = useToast();
+import { useToast } from 'primevue/usetoast'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Dialog from 'primevue/dialog'
+import Dropdown from 'primevue/dropdown'
+import type { Player } from '@/domain/models/Player'
+import { FilterMatchMode } from 'primevue/api'
+import { useRouter } from 'vue-router'
 
-// State
-const loading = ref(true);
+const emit = defineEmits(['view', 'create', 'deleted'])
+
+const playerStore = usePlayerStore()
+const toast = useToast()
+
+const positionOptions = ref([
+  'QB',
+  'RB',
+  'FB',
+  'WR',
+  'TE',
+  'OT',
+  'OG',
+  'C',
+  'DE',
+  'DT',
+  'LB',
+  'CB',
+  'S',
+  'K',
+  'P'
+])
+
+const loading = computed(() => playerStore.isLoading)
+const players = computed(() => playerStore.players)
+
+const deleteDialog = ref(false)
+const playerToDelete = ref<Player | null>(null)
+
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  firstName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   lastName: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
-  position: { value: null, matchMode: FilterMatchMode.EQUALS }
-});
+  position: { value: null, matchMode: FilterMatchMode.EQUALS },
+  yearEnteredLeague: { value: null, matchMode: FilterMatchMode.DATE_IS }
+})
 
-// Options for position dropdown filter
-const positionOptions = [
-  'QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'P'
-];
+onMounted(async () => {
+  await playerStore.fetchPlayers()
+})
 
-// Computed properties
-const players = computed(() => playerStore.players);
+const router = useRouter()
 
-// Methods
-const loadPlayers = async () => {
-  loading.value = true;
-  try {
-    await playerStore.fetchPlayers();
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load players', life: 3000 });
-  } finally {
-    loading.value = false;
-  }
-};
+// Instead of emitting an event, navigate directly with a query parameter
+const editPlayer = (id: number) => {
+  router.push({
+    path: `/players/${id}`,
+    query: { edit: 'true' }
+  })
+}
 
-const navigateToCreate = () => {
-  router.push({ name: 'PlayerCreate' });
-};
+const formatYearOnly = (date: Date | string | null | undefined): string => {
+  if (!date) return 'N/A'
 
-const viewDetails = (player: { id: any; }) => {
-  router.push({ name: 'PlayerDetail', params: { id: player.id } });
-};
-
-const editPlayer = (player: Player) => {
-  router.push({ name: 'PlayerEdit', params: { id: player.id } });
-};
-
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  return dateObj.getFullYear().toString()
+}
 const confirmDelete = (player: Player) => {
-  confirm.require({
-    message: `Are you sure you want to delete ${player.firstName} ${player.lastName}?`,
-    header: 'Confirm Deletion',
-    icon: 'pi pi-exclamation-triangle',
-    acceptClass: 'p-button-danger',
-    accept: () => deletePlayer(player.id),
-    reject: () => {}
-  });
-};
+  playerToDelete.value = player
+  deleteDialog.value = true
+}
 
-const deletePlayer = async (id: number | undefined) => {
+const closeDeleteDialog = () => {
+  deleteDialog.value = false
+  playerToDelete.value = null
+}
+
+const deletePlayer = async () => {
   try {
-    await playerStore.deletePlayer(id);
-    toast.add({ severity: 'success', summary: 'Success', detail: 'Player deleted successfully', life: 3000 });
+    if (playerToDelete.value && playerToDelete.value.id) {
+      await playerStore.deletePlayer(playerToDelete.value.id)
+      toast.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: `${playerToDelete.value.firstName} ${playerToDelete.value.lastName} was deleted successfully`,
+        life: 3000
+      })
+      emit('deleted', playerToDelete.value.id)
+    }
   } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete player', life: 3000 });
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'There was an error deleting the player',
+      life: 3000
+    })
+  } finally {
+    closeDeleteDialog()
   }
-};
-
-// Lifecycle hooks
-onMounted(() => {
-  loadPlayers();
-});
+}
 </script>
 
 <style scoped>
 .player-list {
-  width: 100%;
+  background-color: var(--light-bg);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.table-header h2 {
+  margin: 0;
+  color: var(--primary-text);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 </style>
-

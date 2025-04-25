@@ -1,20 +1,25 @@
-// src/core/domain/models/Schedule.ts
+// src/domain/models/Schedule.ts
 export interface Schedule {
   id?: number;
-  teamID: number;
-  homeTeamId: number;
-  awayTeamId: number;
-  scheduleWeek: number;
-  gameDate: Date;
-  gameCity: string;
-  gameStateProvince: string;
-  gameCountry: string;
-  gameLocation: string;
-  awayTeamConference: string;
-  awayTeamDivision: string;
-  wonLostFlag: string;
-  homeOrAway: string;
-  awayTeamScore: number;
-  homeScore: number;
+  teamId?: number;
+  seasonYear: string;
+  oppTeamId: number;
+  oppTeamConference?: string;
+  oppTeamDivision?: string;
+  scheduleWeek?: number;
+  gameDate?: Date;
+  gameCity?: string;
+  gameStateProvince?: string;
+  gameCountry?: string;
+  gameLocation?: string;
+  wonLostFlag?: string;
+  homeOrAway?: string;
+  oppTeamScore?: number;
+  teamScore: number;
+  result?: string;
+  
+  // Additional fields for UI purposes - not stored in backend
+ // opposingTeamConference?: string; // Conference of the opposing team
+ // opposingTeamDivision?: string; // Division of the opposing team (short name)
 }
 

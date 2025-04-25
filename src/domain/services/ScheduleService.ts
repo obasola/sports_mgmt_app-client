@@ -1,44 +1,102 @@
-// src/domain/services/scheduleService.ts
-import type{ IScheduleService } from '@/domain/services/interfaces/IScheduleService';
-import type{ IScheduleRepository } from '@/domain/repositories/interfaces/IScheduleRepository';
-import type{ Schedule } from '@/domain/models/Schedule';
+// src/domain/services/ScheduleService.ts
 
-export class ScheduleService implements IScheduleService {
-  private scheduleRepository: IScheduleRepository;
+import { IScheduleRepository } from '@/repositories/interfaces'
+import { ScheduleRepository } from '@/repositories/ScheduleRepository'
+import { Schedule } from '../models'
+import { BaseService } from './BaseService'
+import { DuplicateEntityError } from './errors/DuplicateEntityError'
 
-  constructor(scheduleRepository: IScheduleRepository) {
-    this.scheduleRepository = scheduleRepository;
+export class ScheduleService extends BaseService<Schedule, IScheduleRepository> {
+  constructor(repository: IScheduleRepository = new ScheduleRepository()) {
+    super(repository)
   }
 
-  async getAllSchedules(): Promise<Schedule[]> {
-    return this.scheduleRepository.findAll();
+  /**
+   * Get schedules by team ID
+   */
+  async getByteamId(teamId: number): Promise<Schedule[]> {
+    return this.repository.getByTeamId(teamId)
   }
 
-  async getScheduleById(id: number): Promise<Schedule> {
-    return this.scheduleRepository.findById(id);
+  /**
+   * Get schedules by season year
+   */
+  async getBySeasonYear(year: number): Promise<Schedule[]> {
+    return this.repository.getBySeasonYear(year)
   }
 
-  async getSchedulesByTeamId(teamId: number): Promise<Schedule[]> {
-    return this.scheduleRepository.findByTeamId(teamId);
+  /**
+   * Create a new schedule with duplicate checking
+   */
+  async create(schedule: Schedule): Promise<Schedule> {
+    const teamId = this.getteamId(schedule);
+
+    // Check for duplicates by team and season year
+    const existingSchedule = await this.repository.findDuplicate(
+      teamId, // Using teamId as the teamId for duplicate checking
+      Number(schedule.seasonYear)
+      
+    )
+
+    if (existingSchedule) {
+      throw new DuplicateEntityError(
+        `A schedule for this team and season (${schedule.seasonYear}) already exists`,
+        'Schedule',
+        existingSchedule.id
+      )
+    }
+
+    return this.repository.create(schedule)
   }
 
-  async getSchedulesByWeek(week: number): Promise<Schedule[]> {
-    return this.scheduleRepository.findByWeek(week);
+  /**
+   * Update schedule with duplicate checking
+   */
+  async update(id: number, schedule: Schedule): Promise<Schedule> {
+    const teamId = this.getteamId(schedule);
+    // Check for duplicates (excluding the current schedule)
+    const existingSchedule = await this.repository.findDuplicate(
+      teamId,
+      Number( schedule.seasonYear )
+    )
+
+    if (existingSchedule && existingSchedule.id !== id) {
+      throw new DuplicateEntityError(
+        `Another schedule for this team and season (${schedule.seasonYear}) already exists`,
+        'Schedule',
+        existingSchedule.id
+      )
+    }
+
+    return this.repository.update(id, schedule)
   }
 
-  async getSchedulesByDateRange(startDate: Date, endDate: Date): Promise<Schedule[]> {
-    return this.scheduleRepository.findByDateRange(startDate, endDate);
+  /**
+   * Create or update schedule (handles duplicates automatically)
+   */
+  async createOrUpdate(schedule: Schedule): Promise<Schedule> {
+    try {
+      return await this.create(schedule)
+    } catch (error) {
+      if (error instanceof DuplicateEntityError && error.existingId) {
+        return this.repository.update(error.existingId, schedule)
+      }
+      throw error
+    }
   }
-
-  async createSchedule(schedule: Schedule): Promise<Schedule> {
-    return this.scheduleRepository.create(schedule);
-  }
-
-  async updateSchedule(id: number, schedule: Schedule): Promise<Schedule> {
-    return this.scheduleRepository.update(id, schedule);
-  }
-
-  async deleteSchedule(id: number): Promise<boolean> {
-    return this.scheduleRepository.delete(id);
+  getteamId(schedule: Schedule) : number {
+    let teamId: number = 0;
+    if(typeof schedule.teamId === 'number') {
+        teamId = schedule.teamId;
+    }
+    else
+    if(typeof schedule.teamId === 'number' && schedule.homeOrAway === 'H') {
+        teamId = schedule.teamId;
+    }
+    else
+    if(typeof schedule.oppTeamId === 'number' && schedule.homeOrAway === 'A') {
+        teamId = schedule.oppTeamId;
+    }
+    return teamId;
   }
 }

@@ -1,429 +1,344 @@
-<!-- src/components/player/PlayerForm.vue -->
 <template>
   <div class="player-form">
-    <form @submit.prevent="submitForm">
-      <div class="p-fluid">
-        <div class="p-field mb-3">
-          <span class="p-float-label">
+    <form @submit.prevent="savePlayer">
+      <div class="p-fluid form-grid">
+        <div class="form-section">
+          <h3>Personal Information</h3>
+          <div class="p-field">
+            <label for="firstName">First Name</label>
             <InputText
               id="firstName"
-              v-model.trim="player.firstName"
-              :class="{ 'p-invalid': v$.firstName.$invalid && v$.firstName.$dirty }"
+              v-model.trim="formData.firstName"
+              :class="{ 'p-invalid': submitted && !formData.firstName }"
               required
             />
-            <label for="firstName">First Name*</label>
-          </span>
-          <small class="p-error" v-if="v$.firstName.$invalid && v$.firstName.$dirty">
-            {{ v$.firstName.$errors[0].$message }}
-          </small>
-        </div>
+            <small v-if="submitted && !formData.firstName" class="p-error"
+              >First name is required</small
+            >
+          </div>
 
-        <div class="p-field mb-3">
-          <span class="p-float-label">
+          <div class="p-field">
+            <label for="lastName">Last Name</label>
             <InputText
               id="lastName"
-              v-model.trim="player.lastName"
-              :class="{ 'p-invalid': v$.lastName.$invalid && v$.lastName.$dirty }"
+              v-model.trim="formData.lastName"
+              :class="{ 'p-invalid': submitted && !formData.lastName }"
               required
             />
-            <label for="lastName">Last Name*</label>
-          </span>
-          <small class="p-error" v-if="v$.lastName.$invalid && v$.lastName.$dirty">
-            {{ v$.lastName.$errors[0].$message }}
-          </small>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col-12 md:col-4">
-            <span class="p-float-label">
-              <InputNumber
-                id="age"
-                v-model="player.age"
-                :min="18"
-                :max="50"
-                :class="{ 'p-invalid': v$.age.$invalid && v$.age.$dirty }"
-                required
-              />
-              <label for="age">Age*</label>
-            </span>
-            <small class="p-error" v-if="v$.age.$invalid && v$.age.$dirty">
-              {{ v$.age.$errors[0].$message }}
-            </small>
+            <small v-if="submitted && !formData.lastName" class="p-error"
+              >Last name is required</small
+            >
           </div>
 
-          <div class="field col-12 md:col-4">
-            <span class="p-float-label">
-              <InputNumber
-                id="height"
-                v-model="player.height"
-                :min="60"
-                :max="96"
-                :class="{ 'p-invalid': v$.height.$invalid && v$.height.$dirty }"
-                required
-              />
-              <label for="height">Height (inches)*</label>
-            </span>
-            <small class="p-error" v-if="v$.height.$invalid && v$.height.$dirty">
-              {{ v$.height.$errors[0].$message }}
-            </small>
-          </div>
-
-          <div class="field col-12 md:col-4">
-            <span class="p-float-label">
-              <InputNumber
-                id="weight"
-                v-model="player.weight"
-                :min="150"
-                :max="400"
-                :class="{ 'p-invalid': v$.weight.$invalid && v$.weight.$dirty }"
-                required
-              />
-              <label for="weight">Weight (lbs)*</label>
-            </span>
-            <small class="p-error" v-if="v$.weight.$invalid && v$.weight.$dirty">
-              {{ v$.weight.$errors[0].$message }}
-            </small>
-          </div>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputNumber
-                id="handSize"
-                v-model="player.handSize"
-                :min="7"
-                :max="12"
-                :step="0.125"
-                :class="{ 'p-invalid': v$.handSize.$invalid && v$.handSize.$dirty }"
-                required
-              />
-              <label for="handSize">Hand Size (inches)*</label>
-            </span>
-            <small class="p-error" v-if="v$.handSize.$invalid && v$.handSize.$dirty">
-              {{ v$.handSize.$errors[0].$message }}
-            </small>
-          </div>
-
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputNumber
-                id="armLength"
-                v-model="player.armLength"
-                :min="25"
-                :max="40"
-                :step="0.125"
-                :class="{ 'p-invalid': v$.armLength.$invalid && v$.armLength.$dirty }"
-                required
-              />
-              <label for="armLength">Arm Length (inches)*</label>
-            </span>
-            <small class="p-error" v-if="v$.armLength.$invalid && v$.armLength.$dirty">
-              {{ v$.armLength.$errors[0].$message }}
-            </small>
-          </div>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputText
-                id="homeCity"
-                v-model.trim="player.homeCity"
-                :class="{ 'p-invalid': v$.homeCity.$invalid && v$.homeCity.$dirty }"
-                required
-              />
-              <label for="homeCity">Home City*</label>
-            </span>
-            <small class="p-error" v-if="v$.homeCity.$invalid && v$.homeCity.$dirty">
-              {{ v$.homeCity.$errors[0].$message }}
-            </small>
-          </div>
-
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputText
-                id="homeState"
-                v-model.trim="player.homeState"
-                :class="{ 'p-invalid': v$.homeState.$invalid && v$.homeState.$dirty }"
-                required
-              />
-              <label for="homeState">Home State*</label>
-            </span>
-            <small class="p-error" v-if="v$.homeState.$invalid && v$.homeState.$dirty">
-              {{ v$.homeState.$errors[0].$message }}
-            </small>
-          </div>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputText
-                id="university"
-                v-model.trim="player.university"
-                :class="{ 'p-invalid': v$.university.$invalid && v$.university.$dirty }"
-                required
-              />
-              <label for="university">University*</label>
-            </span>
-            <small class="p-error" v-if="v$.university.$invalid && v$.university.$dirty">
-              {{ v$.university.$errors[0].$message }}
-            </small>
-          </div>
-
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <InputNumber
-                id="yearEnteredLeague"
-                v-model="player.yearEnteredLeague"
-                :min="1970"
-                :max="currentYear"
-                :class="{ 'p-invalid': v$.yearEnteredLeague.$invalid && v$.yearEnteredLeague.$dirty }"
-                required
-              />
-              <label for="yearEnteredLeague">Year Entered League*</label>
-            </span>
-            <small class="p-error" v-if="v$.yearEnteredLeague.$invalid && v$.yearEnteredLeague.$dirty">
-              {{ v$.yearEnteredLeague.$errors[0].$message }}
-            </small>
-          </div>
-        </div>
-
-        <div class="formgrid grid">
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <Dropdown
-                id="position"
-                v-model="player.position"
-                :options="positionOptions"
-                :class="{ 'p-invalid': v$.position.$invalid && v$.position.$dirty }"
-                required
-              />
-              <label for="position">Position*</label>
-            </span>
-            <small class="p-error" v-if="v$.position.$invalid && v$.position.$dirty">
-              {{ v$.position.$errors[0].$message }}
-            </small>
-          </div>
-
-          <div class="field col-12 md:col-6">
-            <span class="p-float-label">
-              <Dropdown
-                id="teamId"
-                v-model="player.teamId"
-                :options="teams"
-                optionLabel="name"
-                optionValue="id"
-                :filter="true"
-                :class="{ 'p-invalid': v$.teamId.$invalid && v$.teamId.$dirty }"
-                required
-              />
-              <label for="teamId">Team*</label>
-            </span>
-            <small class="p-error" v-if="v$.teamId.$invalid && v$.teamId.$dirty">
-              {{ v$.teamId.$errors[0].$message }}
-            </small>
-          </div>
-        </div>
-
-        <div class="formgrid grid mt-4">
-          <div class="field col-12">
-            <Button
-              type="submit"
-              :label="isEditMode ? 'Update Player' : 'Create Player'"
-              class="p-button-primary mr-2"
-              :loading="submitting"
+          <div class="p-field">
+            <label for="age">Age</label>
+            <InputNumber
+              id="age"
+              v-model="formData.age"
+              :min="18"
+              :max="50"
+              :class="{ 'p-invalid': submitted && !formData.age }"
+              required
             />
-            <Button
-              type="button"
-              label="Cancel"
-              class="p-button-secondary"
-              @click="cancelForm"
-              :disabled="submitting"
+            <small v-if="submitted && !formData.age" class="p-error">Age is required</small>
+          </div>
+
+          <div class="p-field">
+            <label for="height">Height (inches)</label>
+            <InputNumber
+              id="height"
+              v-model="formData.height"
+              :min="60"
+              :max="96"
+              :class="{ 'p-invalid': submitted && !formData.height }"
+              required
             />
+            <small v-if="submitted && !formData.height" class="p-error">Height is required</small>
+          </div>
+
+          <div class="p-field">
+            <label for="weight">Weight (lbs)</label>
+            <InputNumber
+              id="weight"
+              v-model="formData.weight"
+              :min="150"
+              :max="400"
+              :class="{ 'p-invalid': submitted && !formData.weight }"
+              required
+            />
+            <small v-if="submitted && !formData.weight" class="p-error">Weight is required</small>
+          </div>
+
+          <div class="p-field">
+            <label for="handSize">Hand Size (inches)</label>
+            <InputNumber
+              id="handSize"
+              v-model="formData.handSize"
+              :min="7"
+              :max="12"
+              :step="0.125"
+              :class="{ 'p-invalid': submitted && !formData.handSize }"
+              required
+            />
+            <small v-if="submitted && !formData.handSize" class="p-error"
+              >Hand size is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="armLength">Arm Length (inches)</label>
+            <InputNumber
+              id="armLength"
+              v-model="formData.armLength"
+              :min="25"
+              :max="40"
+              :step="0.125"
+              :class="{ 'p-invalid': submitted && !formData.armLength }"
+              required
+            />
+            <small v-if="submitted && !formData.armLength" class="p-error"
+              >Arm length is required</small
+            >
           </div>
         </div>
+
+        <div class="form-section">
+          <h3>Location & Career</h3>
+          <div class="p-field">
+            <label for="homeCity">Home City</label>
+            <InputText
+              id="homeCity"
+              v-model.trim="formData.homeCity"
+              :class="{ 'p-invalid': submitted && !formData.homeCity }"
+              required
+            />
+            <small v-if="submitted && !formData.homeCity" class="p-error"
+              >Home city is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="homeState">Home State</label>
+            <InputText
+              id="homeState"
+              v-model.trim="formData.homeState"
+              :class="{ 'p-invalid': submitted && !formData.homeState }"
+              required
+            />
+            <small v-if="submitted && !formData.homeState" class="p-error"
+              >Home state is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="university">University</label>
+            <InputText
+              id="university"
+              v-model.trim="formData.university"
+              :class="{ 'p-invalid': submitted && !formData.university }"
+              required
+            />
+            <small v-if="submitted && !formData.university" class="p-error"
+              >University is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="yearEnteredLeague">Year Entered League</label>
+            <Calendar
+              id="yearEnteredLeague"
+              v-model="formData.yearEnteredLeague"
+              view="year"
+              dateFormat="yy"
+              :showIcon="true"
+              :class="{ 'p-invalid': submitted && !formData.yearEnteredLeague }"
+              required
+            />
+            <small v-if="submitted && !formData.yearEnteredLeague" class="p-error"
+              >Year is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="position">Position</label>
+            <Dropdown
+              id="position"
+              v-model="formData.position"
+              :options="positionOptions"
+              :class="{ 'p-invalid': submitted && !formData.position }"
+              required
+            />
+            <small v-if="submitted && !formData.position" class="p-error"
+              >Position is required</small
+            >
+          </div>
+
+          <div class="p-field">
+            <label for="teamId">Team</label>
+            <Dropdown
+              id="teamId"
+              v-model="formData.team"
+              :options="teams"
+              optionLabel="name"
+              optionValue="id"
+              :class="{ 'p-invalid': submitted && !formData.team }"
+              required
+            />
+            <small v-if="submitted && !formData.team?.id" class="p-error">Team is required</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <Button
+          label="Cancel"
+          icon="pi pi-times"
+          class="p-button-text"
+          @click="$emit('cancel')"
+          type="button"
+        />
+        <Button label="Save" icon="pi pi-check" class="p-button-success" type="submit" />
       </div>
     </form>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { ref, computed, reactive, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { useVuelidate } from '@vuelidate/core';
-import { required, minValue, maxValue, minLength } from '@vuelidate/validators';
-import { usePlayerStore } from '../../infrastructure/store/player.store';
-import { useTeamStore } from '../../infrastructure/store/team.store';
-import { useToast } from 'primevue/usetoast';
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
-import Dropdown from 'primevue/dropdown';
-import Button from 'primevue/button';
-import type { Player } from '../../domain/models/Player';
+<script setup lang="ts">
+import { ref, computed, reactive, onMounted } from 'vue'
+import { useTeamStore } from '@/stores/team'
+import type { Player } from '@/domain/models/Player'
+import InputText from 'primevue/inputtext'
+import InputNumber from 'primevue/inputnumber'
+import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
+import Calendar from 'primevue/calendar'
 
-// Props
-const props = defineProps({
-  playerId: {
-    type: [Number, String],
-    default: null
-  },
-  isEditMode: {
-    type: Boolean,
-    default: false
-  }
-});
+const props = defineProps<{
+  player?: Player
+}>()
 
-// Emit events
-const emit = defineEmits(['saved', 'cancelled']);
+const emit = defineEmits(['save', 'cancel'])
 
-// Stores and router
-const playerStore = usePlayerStore();
-const teamStore = useTeamStore();
-const router = useRouter();
-const route = useRoute();
-const toast = useToast();
+const teamStore = useTeamStore()
+const teams = computed(() => teamStore.teams)
+const currentYear = new Date().getFullYear()
+const submitted = ref(false)
 
-// State
-const currentYear = new Date().getFullYear();
-const submitting = ref(false);
-const player = reactive<Player>({
-  firstName: '',
-  lastName: '',
-  age: 22,
-  height: 72,
-  weight: 200,
-  handSize: 9,
-  armLength: 32,
-  homeCity: '',
-  homeState: '',
-  university: '',
-  yearEnteredLeague: currentYear,
-  position: '',
-  teamId: Number(route.query.teamId) || 0,
-  pickId: 0
-});
-
-// Options for position dropdown
 const positionOptions = [
-  'QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K', 'P'
-];
+  'QB',
+  'RB',
+  'FB',
+  'WR',
+  'TE',
+  'OT',
+  'OG',
+  'C',
+  'DE',
+  'DT',
+  'LB',
+  'CB',
+  'S',
+  'K',
+  'P'
+]
 
-// Validation rules
-const rules = {
-  firstName: { required, minLength: minLength(2) },
-  lastName: { required, minLength: minLength(2) },
-  age: { required, minValue: minValue(18), maxValue: maxValue(50) },
-  height: { required, minValue: minValue(60), maxValue: maxValue(96) },
-  weight: { required, minValue: minValue(150), maxValue: maxValue(400) },
-  handSize: { required, minValue: minValue(7), maxValue: maxValue(12) },
-  armLength: { required, minValue: minValue(25), maxValue: maxValue(40) },
-  homeCity: { required, minLength: minLength(2) },
-  homeState: { required, minLength: minLength(2) },
-  university: { required, minLength: minLength(2) },
-  yearEnteredLeague: { required, minValue: minValue(1970), maxValue: maxValue(currentYear) },
-  position: { required },
-  teamId: { required, minValue: minValue(1) }
-};
+// Create reactive form data with default values
+const formData = reactive<Player>({
+  id: props.player?.id,
+  firstName: props.player?.firstName || '',
+  lastName: props.player?.lastName || '',
+  age: props.player?.age || 22,
+  height: props.player?.height || 72, // 6 feet
+  weight: props.player?.weight || 200,
+  handSize: props.player?.handSize || 9,
+  armLength: props.player?.armLength || 32,
+  homeCity: props.player?.homeCity || '',
+  homeState: props.player?.homeState || '',
+  university: props.player?.university || '',
+  yearEnteredLeague: props.player?.yearEnteredLeague || new Date(currentYear, 0, 1), // Default to January 1st of current year
+  position: props.player?.position || '',
+  team: props.player?.team || undefined,
+  pick: props.player?.pick || undefined
+})
 
-const v$ = useVuelidate(rules, player);
-
-// Computed
-const teams = computed(() => teamStore.teams);
-
-// Methods
-const loadTeams = async () => {
-  if (teams.value.length === 0) {
-    try {
-      await teamStore.fetchTeams();
-    } catch (error) {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load teams', life: 3000 });
-    }
-  }
-};
-
-const loadPlayer = async (id: number) => {
-  try {
-    await playerStore.fetchPlayerById(id);
-    const loadedPlayer = playerStore.currentPlayer;
-
-    if (loadedPlayer) {
-      // Copy player data to our reactive object
-      Object.assign(player, loadedPlayer);
-    } else {
-      toast.add({ severity: 'error', summary: 'Error', detail: 'Player not found', life: 3000 });
-      router.push({ name: 'Players' });
-    }
-  } catch (error) {
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to load player', life: 3000 });
-    router.push({ name: 'Players' });
-  }
-};
-
-const submitForm = async () => {
-  const isValid = await v$.value.$validate();
-
-  if (!isValid) {
-    toast.add({ severity: 'error', summary: 'Validation Error', detail: 'Please correct the form errors', life: 3000 });
-    return;
-  }
-
-  submitting.value = true;
-
-  try {
-    if (props.isEditMode && props.playerId) {
-      await playerStore.updatePlayer(Number(props.playerId), player);
-      toast.add({ severity: 'success', summary: 'Success', detail: 'Player updated successfully', life: 3000 });
-    } else {
-      await playerStore.createPlayer(player);
-      toast.add({ severity: 'success', summary: 'Success', detail: 'Player created successfully', life: 3000 });
-    }
-
-    emit('saved');
-
-    // If this was created from team detail, go back to that team
-    if (route.query.teamId && !props.isEditMode) {
-      router.push({ name: 'TeamDetail', params: { id: route.query.teamId } });
-    } else {
-      router.push({ name: 'Players' });
-    }
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: props.isEditMode ? 'Failed to update player' : 'Failed to create player',
-      life: 3000
-    });
-  } finally {
-    submitting.value = false;
-  }
-};
-
-const cancelForm = () => {
-  emit('cancelled');
-
-  // If this was created from team detail, go back to that team
-  if (route.query.teamId && !props.isEditMode) {
-    router.push({ name: 'TeamDetail', params: { id: route.query.teamId } });
-  } else {
-    router.push({ name: 'Players' });
-  }
-};
-
-// Lifecycle hooks
 onMounted(async () => {
-  await loadTeams();
-
-  if (props.isEditMode && props.playerId) {
-    await loadPlayer(Number(props.playerId));
+  // Fetch teams for the dropdown
+  if (teams.value.length === 0) {
+    await teamStore.fetchTeams()
   }
-});
+})
+
+const savePlayer = () => {
+  submitted.value = true
+
+  // Validate required fields
+  if (
+    !formData.firstName ||
+    !formData.lastName ||
+    !formData.age ||
+    !formData.height ||
+    !formData.weight ||
+    !formData.handSize ||
+    !formData.armLength ||
+    !formData.homeCity ||
+    !formData.homeState ||
+    !formData.university ||
+    !formData.yearEnteredLeague ||
+    !formData.position
+  ) {
+    return
+  }
+
+  // Emit save event with form data
+  emit('save', { ...formData })
+}
 </script>
 
 <style scoped>
 .player-form {
-  max-width: 900px;
-  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--primary-text);
+  border-bottom: 1px solid var(--primary-text);
+  padding-bottom: 0.5rem;
+}
+
+.p-field {
+  margin-bottom: 1rem;
+}
+
+.p-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

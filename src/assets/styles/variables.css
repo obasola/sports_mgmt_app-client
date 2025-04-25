@@ -1,0 +1,29 @@
+// src/assets/styles/variables.css
+:root {
+  /* New color scheme for better accessibility */
+  --primary-bg-color: #264653;    /* Dark blue for backgrounds */
+  --secondary-bg-color: #2a9d8f;  /* Teal for secondary elements and accents */
+  --accent-color: #e76f51;        /* Coral for buttons, highlights, and interactive elements */
+  --light-color: #e9c46a;         /* Yellow/gold for text on dark backgrounds */
+  --alternate-accent: #f4a261;    /* Light orange for alternative accent */
+  
+  /* Additional utility colors */
+  --white: #ffffff;
+  --dark-text: #333333;
+  --border-color: #dddddd;
+  --success-color: #2a9d8f;       /* Using teal for success states */
+  --warning-color: #f4a261;       /* Using light orange for warnings */
+  --error-color: #e76f51;         /* Using coral for errors */
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* High contrast mode variables */
+.high-contrast {
+  --primary-bg-color: #1a1a1a;
+  --secondary-bg-color: #006666;
+  --accent-color: #ff5722;
+  --light-color: #ffeb3b;
+  --alternate-accent: #ff9800;
+  --dark-text: #ffffff;
+  --border-color: #ffffff;
+}

@@ -1,9 +1,10 @@
+import { Player } from './Player'
 
-
-// src/core/domain/models/PlayerAward.ts
+// src/domain/models/PlayerAward.ts
 export interface PlayerAward {
-  id?: number;
-  playerId: number;
-  awardName: string;
-  awardYear: number;
+  id?: number
+  name: string
+  yearAwarded: number
+  playerId: number
+  player?: Player
 }

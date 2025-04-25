@@ -1,38 +1,35 @@
-// src/App.vue
 <template>
-  <div class="app-container">
+  <div class="app-wrapper">
     <Navbar />
-    <main class="main-content">
+    
+    <div class="main-content">
+      <Toast />
+      <ConfirmDialog></ConfirmDialog>
       <router-view />
-    </main>
+    </div>
     <Footer />
-    <Toast />
-    <ConfirmDialog />
   </div>
 </template>
 
-<script lang="ts" setup>
-import { onMounted } from 'vue';
-import Navbar from './components/common/Navbar.vue';
-import Footer from './components/common/Footer.vue';
-import Toast from 'primevue/toast';
-import ConfirmDialog from 'primevue/confirmdialog';
-
-onMounted(() => {
-  // Initialization logic if needed
-  console.log('Application mounted');
-});
+<script setup lang="ts">
+import Navbar from '@/components/common/Navbar.vue'
+import Footer from '@/components/common/Footer.vue'
+import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 </script>
 
 <style>
-.app-container {
+.app-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: #003049;
+  color: #780000;
 }
 
 .main-content {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
+  margin-top: 4rem;
 }
 </style>

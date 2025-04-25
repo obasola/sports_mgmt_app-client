@@ -1,0 +1,493 @@
+/* src/assets/styles/main.css */
+@import './variables.css';
+@import 'primevue/resources/themes/lara-light-blue/theme.css';
+@import 'primevue/resources/primevue.min.css';
+@import 'primeicons/primeicons.css';
+
+body {
+  background-color: var(--primary-bg-color);
+  color: var(--light-color);
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* Larger default font for better readability */
+html {
+  font-size: 16px;
+}
+
+/* Global styles with updated colors */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.card {
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--box-shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Update button styles with new color scheme */
+.btn {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+  border: none;
+}
+
+.btn:focus {
+  outline: 3px solid var(--alternate-accent);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: #c85a3e; /* Darker version of accent color */
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-bg-color);
+  color: var(--white);
+}
+
+.btn-secondary:hover {
+  background-color: #238076; /* Darker version of secondary color */
+  transform: translateY(-2px);
+}
+
+/* Panel content styling */
+.panel-content {
+  padding: 1rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 0 0 4px 4px;
+  color: var(--dark-text);
+}
+
+/* Form elements with increased contrast */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.625rem;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-control:focus {
+  border-color: var(--secondary-bg-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.25);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--light-color);
+}
+
+/* Status messages */
+.text-danger {
+  color: var(--error-color);
+  font-weight: 500;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--light-color);
+}
+
+.page-title {
+  color: var(--light-color);
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* Accessibility improvements */
+a {
+  color: var(--alternate-accent);
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: var(--accent-color);
+}
+
+a:focus {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+/* Focus states for interactive elements */
+button:focus, 
+input:focus, 
+select:focus, 
+textarea:focus {
+  outline: 3px solid var(--alternate-accent);
+  outline-offset: 2px;
+}
+
+/* Add a class for screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Make sure text inputs have sufficient contrast */
+input, select, textarea {
+  color: var(--dark-text);
+  background-color: var(--white);
+}
+
+/* Empty state styling */
+.empty-state {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  color: var(--light-color);
+  border: 1px solid rgba(233, 196, 106, 0.3);
+}
+
+/* Error message styling */
+.error-message {
+  background-color: rgba(231, 111, 81, 0.2);
+  color: var(--light-color);
+  padding: 1rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid var(--error-color);
+}
+
+/* Updated BaseButton.vue styles */
+.base-button {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    font-size: 1rem;
+  }
+  
+  .base-button--primary {
+    background-color: var(--accent-color);
+    color: var(--white);
+  }
+  
+  .base-button--primary:hover:not(.base-button--disabled) {
+    background-color: #c85a3e; /* Darker version of accent */
+    transform: translateY(-2px);
+  }
+  
+  .base-button--secondary {
+    background-color: var(--secondary-bg-color);
+    color: var(--white);
+  }
+  
+  .base-button--secondary:hover:not(.base-button--disabled) {
+    background-color: #238076; /* Darker version of secondary */
+    transform: translateY(-2px);
+  }
+  
+  .base-button--success {
+    background-color: var(--success-color);
+    color: var(--white);
+  }
+  
+  .base-button--success:hover:not(.base-button--disabled) {
+    background-color: #238076;
+  }
+  
+  .base-button--danger {
+    background-color: var(--error-color);
+    color: var(--white);
+  }
+  
+  .base-button--danger:hover:not(.base-button--disabled) {
+    background-color: #c85a3e;
+  }
+  
+  .base-button--warning {
+    background-color: var(--warning-color);
+    color: var(--dark-text);
+  }
+  
+  .base-button--warning:hover:not(.base-button--disabled) {
+    background-color: #e38b4e; /* Darker version of warning */
+  }
+  
+  .base-button--text {
+    background-color: transparent;
+    color: var(--alternate-accent);
+    padding: 0.25rem 0.5rem;
+    text-decoration: underline;
+  }
+  
+  .base-button--text:hover:not(.base-button--disabled) {
+    color: var(--accent-color);
+    background-color: rgba(231, 111, 81, 0.05);
+  }
+  
+  .base-button:focus {
+    outline: 3px solid var(--alternate-accent);
+    outline-offset: 2px;
+  }
+  
+  .base-button--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  /* Updated CollapsiblePanel.vue styles */
+  .collapsible-panel {
+    border: 1px solid rgba(233, 196, 106, 0.3);
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  
+  .collapsible-panel__header {
+    padding: 1rem 1.5rem;
+    background-color: rgba(42, 157, 143, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .collapsible-panel__header:hover {
+    background-color: rgba(42, 157, 143, 0.2);
+  }
+  
+  .collapsible-panel__header--open {
+    border-bottom: 1px solid rgba(233, 196, 106, 0.3);
+    background-color: rgba(42, 157, 143, 0.15);
+  }
+  
+  .collapsible-panel__title {
+    font-weight: 600;
+    color: var(--light-color);
+    font-size: 1.1rem;
+  }
+  
+  .collapsible-panel__icon {
+    color: var(--light-color);
+    transition: transform 0.3s ease;
+  }
+  
+  .collapsible-panel__header--open .collapsible-panel__icon {
+    transform: rotate(180deg);
+  }
+  
+  .collapsible-panel__content {
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--light-color);
+  }
+  
+  /* Updated BaseCard.vue styles */
+  .base-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(233, 196, 106, 0.2);
+  }
+  
+  .base-card__header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(233, 196, 106, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(42, 157, 143, 0.1);
+  }
+  
+  .base-card__title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--light-color);
+  }
+  
+  .base-card__content:not(.base-card--no-padding) {
+    padding: 1.5rem;
+  }
+  
+  .base-card__footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(233, 196, 106, 0.2);
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    background-color: rgba(42, 157, 143, 0.05);
+  }
+  
+  /* Updated Input/Form Styles */
+  .base-input__label,
+  .base-select__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--light-color);
+    font-size: 1rem;
+  }
+  
+  .base-input__required,
+  .base-select__required {
+    color: var(--error-color);
+    margin-left: 4px;
+  }
+  
+  .base-input__input,
+  .base-select__select {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    font-size: 1rem;
+    border: 2px solid rgba(233, 196, 106, 0.3);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--dark-text);
+  }
+  
+  .base-input__input:focus,
+  .base-select__select:focus {
+    outline: none;
+    border-color: var(--alternate-accent);
+    box-shadow: 0 0 0 3px rgba(244, 162, 97, 0.25);
+  }
+  
+  .base-input--error .base-input__input,
+  .base-select--error .base-select__select {
+    border-color: var(--error-color);
+  }
+  
+  .base-input--error .base-input__input:focus,
+  .base-select--error .base-select__select:focus {
+    box-shadow: 0 0 0 3px rgba(231, 111, 81, 0.25);
+  }
+  
+  .base-input__error,
+  .base-select__error {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-weight: 500;
+  }
+  
+  /* Team/Player Card Styling */
+  .team-card,
+  .player-card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(233, 196, 106, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .team-card:hover,
+  .player-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border-color: rgba(233, 196, 106, 0.4);
+  }
+  
+  .team-card__name,
+  .player-card__name {
+    color: var(--light-color);
+  }
+  
+  .team-card__info i,
+  .player-card__position {
+    color: var(--alternate-accent);
+  }
+  
+  /* Modal Styling */
+  .modal-overlay {
+    background-color: rgba(38, 70, 83, 0.8);
+  }
+  
+  .modal-container {
+    background-color: var(--primary-bg-color);
+    border: 1px solid rgba(233, 196, 106, 0.3);
+  }
+  
+  .modal-header {
+    border-bottom: 1px solid rgba(233, 196, 106, 0.3);
+    background-color: rgba(42, 157, 143, 0.1);
+  }
+  
+  .modal-title {
+    color: var(--light-color);
+  }
+  
+  .modal-close {
+    color: var(--light-color);
+  }
+  
+  /* Accessibility-focused Navigation */
+  .app-header {
+    background-color: var(--primary-bg-color);
+    border-bottom: 1px solid rgba(233, 196, 106, 0.3);
+  }
+  
+  .app-header__logo a {
+    color: var(--light-color);
+    font-size: 1.75rem;
+  }
+  
+  .nav-link {
+    color: var(--alternate-accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  
+  .nav-link:hover {
+    color: var(--accent-color);
+  }
+  
+  .nav-link.router-link-active {
+    color: var(--light-color);
+  }
+  
+  .nav-link.router-link-active::after {
+    background-color: var(--accent-color);
+    height: 3px;
+  }
