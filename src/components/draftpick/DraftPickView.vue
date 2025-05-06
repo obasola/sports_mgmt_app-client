@@ -85,8 +85,8 @@
                   <label>Player:</label>
                   <span>{{
                     draftPick.player
-                      ? `${draftPick.player.firstName} ${draftPick.player.lastName}`
-                      : getPlayerName(draftPick.playerId)
+                      ? `${draftPick.playerFirstName} ${draftPick.playerFirstName}`
+                      : getPlayerName(draftPick.playerId ? draftPick.playerId : 0)
                   }}</span>
                 </div>
                 <div class="info-item">
@@ -131,7 +131,7 @@
                     <Button
                       label="View Full Player Profile"
                       icon="pi pi-user"
-                      @click="viewPlayer(draftPick.playerId)"
+                      @click="viewPlayer(draftPick.playerId ? draftPick.playerId : 0)"
                     />
                   </div>
                 </div>

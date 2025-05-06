@@ -7,7 +7,9 @@ import { IDraftPickRepository } from './interfaces/IDraftPickRepository';
 
 export class DraftPickRepository implements IDraftPickRepository {
   async getAll(): Promise<DraftPick[]> {
-    const response = await apiClient.get('/draft-picks');
+    alert("calling: /draft-picks/with-details ");
+    const response = await apiClient.get('/draft-picks/with-details');
+    alert("response: "+ response.data);
     return response.data;
   }
 
@@ -36,13 +38,13 @@ export class DraftPickRepository implements IDraftPickRepository {
 
   async findDuplicateByYearRoundPick(year: number, round: number, pickNumber: number): Promise<DraftPick | null> {
     const picks = await this.getAll();
-    
-    const duplicate = picks.find(p => 
+
+    const duplicate = picks.find(p =>
       p.draftYear === year &&
       p.round === round &&
       p.pickNumber === pickNumber
     );
-    
+
     return duplicate || null;
   }
 

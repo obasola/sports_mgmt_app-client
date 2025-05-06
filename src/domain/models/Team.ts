@@ -10,6 +10,6 @@ export interface Team {
   division: string
   stadium: string
   country: string
-  scheduleId: number
+  scheduleId?: number
 }
 

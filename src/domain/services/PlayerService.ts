@@ -13,6 +13,18 @@ export class PlayerService extends BaseService<Player, IPlayerRepository> {
   /**
    * Get players by team ID
    */
+  async getAll(): Promise<Player[]> {
+    return this.repository.getAll();
+  }
+
+  async getAllUnassigned(): Promise<Player[]> {
+    return this.repository.getAllUnassigned();
+  }
+
+
+  /**
+   * Get players by team ID
+   */
   async getByTeamId(teamId: number): Promise<Player[]> {
     return this.repository.getByTeamId(teamId)
   }
@@ -76,4 +88,12 @@ export class PlayerService extends BaseService<Player, IPlayerRepository> {
       throw error
     }
   }
+  /** Requires mods to Repository class and/or routes
+  async getUndraftedPlayers(): Promise<Player[]> {
+    // This endpoint would need to be implemented on the backend
+    // to return players who don't have an associated draft record
+    const response = await apiClient.get(`${this.baseUrl}/undrafted`);
+    return response.data;
+  }
+  */
 }

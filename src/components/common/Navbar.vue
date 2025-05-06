@@ -41,13 +41,7 @@ const items = ref([
     command: () => goToPage('schedules'),
     to: { name: 'shedules' }
   },
-  {
-    label: 'Draft',
-    icon: 'pi pi-list',
-    styleClass: 'green-icon',
-    command: () => goToPage('draft-picks'),
-    to: { name: 'draft-picks' }
-  },
+
   {
     label: 'Awards',
     icon: 'fa fa-trophy',
@@ -63,18 +57,39 @@ const items = ref([
     to: { name: 'combine-scores' }
   },
   {
-    label: 'Draft',
-    icon: 'pi pi-stopwatch',
+    label: 'Draft Menu',
+    icon: 'pi pi-folder',
     styleClass: 'green-icon',
-    command: () => goToPage('draft'),
-    to: { name: 'draft' }
-  },
-  {
-    label: 'Track Draft',
-    icon: 'pi pi-stopwatch',
-    styleClass: 'green-icon',
-    command: () => goToPage('draft-tracker'),
-    to: { name: 'draft-tracker' }
+    items: [
+      {
+        label: 'Draft',
+        icon: 'pi pi-list',
+        styleClass: 'green-icon',
+        command: () => goToPage('draft-picks'),
+        to: { name: 'draft-picks' }
+      },
+      {
+        label: 'Draft Selection',
+        icon: 'pi pi-stopwatch',
+        styleClass: 'green-icon',
+        command: () => goToPage('draft-selection-list'),
+        to: { name: 'DraftSelectionList' }
+      },
+      {
+        label: 'Draft Tracker',
+        icon: 'pi pi-stopwatch',
+        styleClass: 'green-icon',
+        command: () => goToPage('draft'),
+        to: { name: 'draft' }
+      },
+      {
+        label: 'Track Draft',
+        icon: 'pi pi-stopwatch',
+        styleClass: 'green-icon',
+        command: () => goToPage('draft-tracker'),
+        to: { name: 'draft-tracker' }
+      }
+    ]
   },
   {
     label: 'Batch',

@@ -1,6 +1,6 @@
-import { IDraftProspectRepository } from '@/repositories/interfaces/IDraftProspectRepository';
-import { DraftProspect } from '@/domain/models/DraftProspect';
-import apiClient from '@/utils/axios-config';
+import { DraftProspect } from "@/domain/models/DraftProspect";
+import apiClient from "@/utils/axios-config";
+import { IDraftProspectRepository } from "./interfaces/IDraftProspectRepository";
 
 class DraftProspectRepository implements IDraftProspectRepository {
   async getAllProspects(): Promise<DraftProspect[]> {
@@ -109,6 +109,6 @@ export function useDraftProspectRepository(): IDraftProspectRepository {
   if (!draftProspectRepository) {
     draftProspectRepository = new DraftProspectRepository();
   }
-  
+
   return draftProspectRepository;
 }

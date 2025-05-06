@@ -15,20 +15,25 @@ export class PlayerRepository implements IPlayerRepository {
     const response = await apiClient.get('/players');
     return response.data;
   }
+  /** NOT implemented on backend yet!!! */
+  async getAllUnassigned(): Promise<Player[]> {
+    const response = await apiClient.get('/players/unassigned');
+    return response.data;
+  }
 
   async findDuplicate(firstName: string, lastName: string, university: string): Promise<Player | null> {
     // Get all players and filter locally (in a real app, this would be an API endpoint)
     const players = await this.getAll();
-    
-    const duplicate = players.find(p => 
+
+    const duplicate = players.find(p =>
       p.firstName.toLowerCase() === firstName.toLowerCase() &&
       p.lastName.toLowerCase() === lastName.toLowerCase() &&
       p.university.toLowerCase() === university.toLowerCase()
     );
-    
+
     return duplicate || null;
   }
-  
+
   async getById(id: number): Promise<Player> {
     const response = await apiClient.get(`/players/${id}`);
     return response.data;

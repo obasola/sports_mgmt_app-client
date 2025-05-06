@@ -5,12 +5,13 @@
   import type { PlayerAward } from '@/domain/models/PlayerAward';
   import type { CombineScore } from '@/domain/models/CombineScore';
 import { DraftProspect } from '@/domain/models/DraftProspect';
-  
+
 
   /**
    * Player repository interface
    */
   export interface IPlayerRepository extends IBaseRepository<Player> {
+    getAllUnassigned(): Promise<Player[]>;
     getByTeamId(teamId: number): Promise<Player[]>;
     getPlayersByTeamId(teamId: number): Promise<Player[]>;
     getPlayerAwards(playerId: number): Promise<PlayerAward[]>;
@@ -22,5 +23,4 @@ import { DraftProspect } from '@/domain/models/DraftProspect';
     getDraftedPlayers(): Promise<DraftProspect[]>;
     getProspectById(id: number): Promise<DraftProspect | null>;
   }
-  
-  
+
