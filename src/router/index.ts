@@ -1,182 +1,86 @@
 // src/router/index.ts
 import { createRouter, createWebHistory } from 'vue-router'
-import TeamSelectionView from '@/views/TeamSelectionView.vue'
-import DraftTrackerView from '@/views/DraftTrackerView.vue'
+import Home from '@/views/Home.vue'
+import PlayerDetail from '@/views/PlayerDetail.vue'
+import TeamDetail from '@/views/TeamDetail.vue'
+import PlayerAwardDetail from '@/views/PlayerAwardDetail.vue'
+import PlayerTeamDetail from '@/views/PlayerTeamDetail.vue'
+import CombineScoreDetail from '@/views/CombineScoreDetail.vue'
+import DraftPickDetail from '@/views/DraftPickDetail.vue'
+import ProspectDetail from '@/views/ProspectDetail.vue'
+/*
 
-// Import the parent view component
-import DraftSelectionView from '@/views/DraftSelectionView.vue';
+import ScheduleDetail from '@/views/ScheduleDetail.vue'
 
-// Import child components
-import DraftSelectionList from '@/components/draftselection/DraftSelectionList.vue';
-import DraftSelectionDetails from '@/components/draftselection/DraftSelectionView.vue';
-import DraftSelectionForm from '@/components/draftselection/DraftSelectionForm.vue';
-
+import TeamNeedDetail from '@/views/TeamNeedDetail.vue'
+import PostSeasonResultDetail from '@/views/PostSeasonResultDetail.vue'
+*/
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('@/views/HomeView.vue'),
-    },
-    // Player routes
-    {
-      path: '/players',
-      name: 'players',
-      component: () => import('@/views/PlayerView.vue'),
+      name: 'Home',
+      component: Home,
     },
     {
-      path: '/players/:id',
-      name: 'player-detail',
-      component: () => import('@/views/PlayerView.vue'),
-      props: true,
-    },
-    // Team routes
-    {
-      path: '/teams',
-      name: 'teams',
-      component: () => import('@/views/TeamView.vue'),
+      path: '/players/:id?',
+      name: 'PlayerDetail',
+      component: PlayerDetail,
     },
     {
-      path: '/teams/:id',
-      name: 'team-detail',
-      component: () => import('@/views/TeamView.vue'),
-      props: true,
-    },
-    // Schedule routes
-    {
-      path: '/schedules',
-      name: 'schedules',
-      component: () => import('@/views/ScheduleView.vue'),
+      path: '/teams/:id?',
+      name: 'TeamDetail',
+      component: TeamDetail,
     },
     {
-      path: '/schedules/:id',
-      name: 'schedule-detail',
-      component: () => import('@/views/ScheduleView.vue'),
-      props: true,
-    },
-    // Draft pick routes
-    {
-      path: '/draft-picks',
-      name: 'draft-picks',
-      component: () => import('@/views/DraftPickView.vue'),
+      path: '/player-awards/:id?',
+      name: 'PlayerAwardDetail',
+      component: PlayerAwardDetail,
     },
     {
-      path: '/draft-picks/:id',
-      name: 'draft-pick-detail',
-      component: () => import('@/views/DraftPickView.vue'),
-      props: true,
-    },
-    // Player award routes
-    {
-      path: '/player-awards',
-      name: 'player-awards',
-      component: () => import('@/views/PlayerAwardView.vue'),
+      path: '/player-teams/:id?',
+      name: 'PlayerTeamDetail',
+      component: PlayerTeamDetail,
     },
     {
-      path: '/player-awards/:id',
-      name: 'player-award-detail',
-      component: () => import('@/views/PlayerAwardView.vue'),
-      props: true,
-    },
-    // Combine score routes
-    {
-      path: '/combine-scores',
-      name: 'combine-scores',
-      component: () => import('@/views/CombineScoreView.vue'),
+      path: '/combine-scores/:id?',
+      name: 'CombineScoreDetail',
+      component: CombineScoreDetail,
     },
     {
-      path: '/combine-scores/:id',
-      name: 'combine-score-detail',
-      component: () => import('@/views/CombineScoreView.vue'),
-      props: true,
-    },
-    // Not found route
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: () => import('@/views/NotFoundView.vue'),
+      path: '/draft-picks/:id?',
+      name: 'DraftPickDetail',
+      component: DraftPickDetail,
     },
     {
-      path: '/draft',
-      name: 'draft',
-      component: TeamSelectionView,
+      path: '/prospects/:id?',
+      name: 'ProspectDetail',
+      component: ProspectDetail,
+    },
+    /*
+    
+    {
+      path: '/schedules/:id?',
+      name: 'ScheduleDetail',
+      component: ScheduleDetail,
     },
     {
-      path: '/draft-tracker',
-      name: 'draft-tracker',
-      component: DraftTrackerView,
-    },
-    // Draft Selection routes - nested under the parent view
-    {
-      path: '/draft-selections',
-      component: DraftSelectionView,
-      children: [
-        {
-          path: '/draft-selection-list',
-          name: 'DraftSelectionList',
-          component: DraftSelectionList,
-          meta: {
-            title: 'NFL Draft Selections',
-          },
-        },
-        {
-          path: 'create',
-          name: 'CreateDraftSelection',
-          component: DraftSelectionForm,
-          meta: {
-            title: 'Record Draft Pick',
-          },
-        },
-        {
-          path: ':id',
-          name: 'DraftSelectionDetails',
-          component: DraftSelectionDetails,
-          meta: {
-            title: 'Draft Pick Details',
-          },
-          props: (route) => {
-            return { id: parseInt(route.params.id as string) }
-          },
-          beforeEnter: (to, _from, next) => {
-            // Redirect to edit form if edit query param is true
-            if (to.query.edit === 'true') {
-              next({
-                name: 'EditDraftSelection',
-                params: { id: to.params.id },
-                replace: true,
-              })
-            } else {
-              next()
-            }
-          },
-        },
-        {
-          path: ':id/edit',
-          name: 'EditDraftSelection',
-          component: DraftSelectionForm,
-          meta: {
-            title: 'Edit Draft Pick',
-          },
-          props: (route) => {
-            return {
-              id: parseInt(route.params.id as string),
-              isEditMode: true,
-            }
-          },
-        },
-      ],
+      path: '/player-awards/:id?',
+      name: 'PlayerAwardDetail',
+      component: PlayerAwardDetail,
     },
     {
-      path: '/batch/upload-prospects',
-      name: 'upload-prospects',
-      component: () => import('@/views/UploadProspectsView.vue'),
+      path: '/team-needs/:id?',
+      name: 'TeamNeedDetail',
+      component: TeamNeedDetail,
     },
     {
-      path: '/batch/upload-combine-scores',
-      name: 'upload-combine-scores',
-      component: () => import('@/views/UploadCombineScoresView.vue'),
+      path: '/post-season-results/:id?',
+      name: 'PostSeasonResultDetail',
+      component: PostSeasonResultDetail,
     },
+    */
   ],
 })
 

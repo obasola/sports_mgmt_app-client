@@ -13,13 +13,13 @@ import Tooltip from 'primevue/tooltip'
 import 'primevue/resources/themes/lara-light-indigo/theme.css'
 import 'primevue/resources/primevue.min.css'
 import 'primeicons/primeicons.css'
-import 'primeflex/primeflex.css'
+// import 'primeflex/primeflex.css'
 
 // Custom Icons
-import '@fortawesome/fontawesome-free/css/all.css' // <- this loads FA icons
+// import '@fortawesome/fontawesome-free/css/all.css' // <- this loads FA icons
 
 // Custom styles
-import './assets/main.css'
+import './assets/styles/main.css'
 import Accordion from 'primevue/accordion'
 import AccordionTab from 'primevue/accordiontab'
 import Button from 'primevue/button'
@@ -33,13 +33,14 @@ import InputText from 'primevue/inputtext'
 import Panel from 'primevue/panel'
 import Toast from 'primevue/toast'
 import Calendar from 'primevue/calendar'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import Card from 'primevue/card'
+import Menubar from 'primevue/menubar'
+import ProgressSpinner from 'primevue/progressspinner'
 
 const app = createApp(App)
 
 
 const pinia = createPinia()
-pinia.use(piniaPluginPersistedstate)
 
 app.use(pinia)
 app.use(router)
@@ -50,17 +51,19 @@ app.directive('tooltip', Tooltip)
 
 // Register PrimeVue components globally
 app.component('Button', Button)
-app.component('Dialog', Dialog)
 app.component('InputText', InputText)
 app.component('InputNumber', InputNumber)
+app.component('Calendar', Calendar)
 app.component('Dropdown', Dropdown)
 app.component('DataTable', DataTable)
 app.component('Column', Column)
+app.component('Card', Card)
 app.component('Panel', Panel)
 app.component('Accordion', Accordion)
 app.component('AccordionTab', AccordionTab)
+app.component('Dialog', Dialog)
 app.component('Toast', Toast)
-app.component('ConfirmDialog', ConfirmDialog)
-app.component('Calendar', Calendar)
+app.component('ProgressSpinner', ProgressSpinner)
+app.component('Menubar', Menubar)
 
 app.mount('#app')
