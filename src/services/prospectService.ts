@@ -1,13 +1,17 @@
 // src/services/prospectService.ts
 import { apiService } from './api'
 import type { Prospect } from '@/types'
+import { ApiResponse } from './apiResponse'
 
 export class ProspectService {
   private readonly endpoint = '/prospects'
 
-  async getAll(): Promise<Prospect[]> {
-    const response = await apiService.get<Prospect[]>(this.endpoint)
-    return response.data
+  async getAll(): Promise<{data: Prospect[], pagination: any}> {
+    const response = await apiService.get<ApiResponse<Prospect[]>>(this.endpoint)
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination
+    }
   }
 
   async getById(id: number): Promise<Prospect> {

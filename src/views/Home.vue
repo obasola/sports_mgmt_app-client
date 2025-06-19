@@ -70,7 +70,7 @@ const navigateTo = (route: string) => {
       </div>
 
       <div class="stats-overview">
-        <Card class="stat-card">
+         <Card class="stat-card">
           <template #content>
             <div class="stat-content">
               <i class="pi pi-users stat-icon"></i>
@@ -82,7 +82,7 @@ const navigateTo = (route: string) => {
           </template>
         </Card>
 
-        <Card class="stat-card">
+        <Card class="stat-card clickable-card" @click="navigateTo('/teams')">
           <template #content>
             <div class="stat-content">
               <i class="pi pi-flag stat-icon"></i>
@@ -153,7 +153,20 @@ const navigateTo = (route: string) => {
 }
 
 .stat-card {
-  cursor: default;
+  cursor: pointer !important;
+}
+
+.clickable-card {
+  cursor: pointer !important;
+}
+
+.clickable-card * {
+  cursor: pointer !important;  /* Apply to all child elements */
+}
+
+.clickable-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .stat-content {

@@ -45,7 +45,8 @@ export const useCombineScoreStore = defineStore('combineScore', () => {
     loading.value = true
     error.value = null
     try {
-      scores.value = await combineScoreService.getAll()
+      const resp = await combineScoreService.getAll()
+      scores.value = resp.data
     } catch (err) {
       error.value = 'Failed to fetch combine scores'
       console.error(err)

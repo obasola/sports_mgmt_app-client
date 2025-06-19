@@ -36,7 +36,8 @@ export const useDraftPickStore = defineStore('draftPick', () => {
     loading.value = true
     error.value = null
     try {
-      draftPicks.value = await draftPickService.getAll()
+      const resp = await draftPickService.getAll()
+      draftPicks.value = resp.data
     } catch (err) {
       error.value = 'Failed to fetch draft picks from server'
       console.error(err)

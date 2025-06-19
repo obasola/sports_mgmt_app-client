@@ -1,13 +1,17 @@
 // src/services/combineScoreService.ts
 import { apiService } from './api'
 import type { CombineScore } from '@/types'
+import { ApiResponse } from './apiResponse'
 
 export class CombineScoreService {
   private readonly endpoint = '/combine-scores'
 
-  async getAll(): Promise<CombineScore[]> {
-    const response = await apiService.get<CombineScore[]>(this.endpoint)
-    return response.data
+  async getAll(): Promise<{data: CombineScore[], pagination: any}> {
+    const response = await apiService.get<ApiResponse<CombineScore[]>>(this.endpoint)
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination
+    }
   }
 
   async getById(id: number): Promise<CombineScore> {

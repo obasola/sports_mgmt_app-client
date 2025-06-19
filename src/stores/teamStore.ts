@@ -31,7 +31,8 @@ export const useTeamStore = defineStore('team', () => {
     loading.value = true
     error.value = null
     try {
-      teams.value = await teamService.getAll()
+      const resp = await teamService.getAll()
+      teams.value = resp.data
     } catch (err) {
       error.value = 'Failed to fetch teams from server'
       console.error(err)

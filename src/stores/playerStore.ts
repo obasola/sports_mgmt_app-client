@@ -27,6 +27,7 @@ export const usePlayerStore = defineStore('player', () => {
       players.value.filter((p) => p.position === position)
   })
 
+  
   // Actions - All data comes from/goes to REST API
   const fetchAll = async (refresh = false) => {
     // Only fetch if we don't have data or explicitly refreshing
@@ -35,7 +36,8 @@ export const usePlayerStore = defineStore('player', () => {
     loading.value = true
     error.value = null
     try {
-      players.value = await playerService.getAll()
+      const resp = await playerService.getAll()  
+      players.value = resp.data
     } catch (err) {
       error.value = 'Failed to fetch players from server'
       console.error(err)

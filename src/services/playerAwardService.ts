@@ -1,13 +1,17 @@
 // src/services/playerAwardService.ts
 import { apiService } from './api'
 import type { PlayerAward } from '@/types'
+import { ApiResponse } from './apiResponse'
 
 export class PlayerAwardService {
   private readonly endpoint = '/player-awards'
 
-  async getAll(): Promise<PlayerAward[]> {
-    const response = await apiService.get<PlayerAward[]>(this.endpoint)
-    return response.data
+  async getAll(): Promise<{data: PlayerAward[], pagination: any}> {
+    const response = await apiService.get<ApiResponse<PlayerAward[]>>(this.endpoint)
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination
+    }
   }
 
   async getById(id: number): Promise<PlayerAward> {

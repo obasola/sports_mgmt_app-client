@@ -40,7 +40,8 @@ export const useProspectStore = defineStore('prospect', () => {
     loading.value = true
     error.value = null
     try {
-      prospects.value = await prospectService.getAll()
+      const resp = await prospectService.getAll()
+      prospects.value = resp.data
     } catch (err) {
       error.value = 'Failed to fetch prospects from server'
       console.error(err)

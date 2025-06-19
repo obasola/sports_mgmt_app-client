@@ -1,13 +1,17 @@
 // src/services/playerTeamService.ts
 import { apiService } from './api'
 import type { PlayerTeam, CreatePlayerTeam } from '@/types'
+import { ApiResponse } from './apiResponse'
 
 export class PlayerTeamService {
   private readonly endpoint = '/player-teams'
 
-  async getAll(): Promise<PlayerTeam[]> {
-    const response = await apiService.get<PlayerTeam[]>(this.endpoint)
-    return response.data
+  async getAll(): Promise<{data: PlayerTeam[], pagination: any}> {
+    const response = await apiService.get<ApiResponse<PlayerTeam[]>>(this.endpoint)
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination
+    }
   }
 
   async getById(id: number): Promise<PlayerTeam> {

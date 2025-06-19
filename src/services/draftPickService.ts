@@ -1,13 +1,18 @@
 // src/services/draftPickService.ts
 import { apiService } from './api'
 import type { DraftPick } from '@/types'
+import { ApiResponse } from './apiResponse'
+
 
 export class DraftPickService {
-  private readonly endpoint = '/draftpicks'
+  private readonly endpoint = '/draft-picks'
 
-  async getAll(): Promise<DraftPick[]> {
-    const response = await apiService.get<DraftPick[]>(this.endpoint)
-    return response.data
+  async getAll(): Promise<{data: DraftPick[], pagination: any}> {
+    const response = await apiService.get<ApiResponse<DraftPick[]>>(this.endpoint)
+    return {
+      data: response.data.data,
+      pagination: response.data.pagination
+    }
   }
 
   async getById(id: number): Promise<DraftPick> {

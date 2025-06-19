@@ -28,7 +28,8 @@ export const usePlayerAwardStore = defineStore('playerAward', () => {
     loading.value = true
     error.value = null
     try {
-      playerAwards.value = await playerAwardService.getAll()
+      const resp = await playerAwardService.getAll()
+      playerAwards.value = resp.data
     } catch (err) {
       error.value = 'Failed to fetch player awards from server'
       console.error(err)
