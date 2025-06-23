@@ -1,5 +1,3 @@
-// src/components/team/TeamReadOnly.vue
-
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useTeamStore } from '@/stores/teamStore'

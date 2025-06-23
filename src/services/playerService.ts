@@ -1,7 +1,7 @@
 // src/services/playerService.ts
 import { apiService } from './api'
-import type { Player } from '@/types'
-import type { ApiResponse } from '@/services/apiResponse'
+import type { ApiResponse, Player } from '@/types'
+
 
 
 export class PlayerService {

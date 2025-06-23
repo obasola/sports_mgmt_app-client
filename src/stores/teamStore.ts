@@ -1,7 +1,8 @@
+// File: src/stores/teamStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { teamService } from '@/services/teamService'
-import type { Team, CrudMode } from '@/types'
+import type { Team, CrudMode, PaginationMeta } from '@/types'
 
 export const useTeamStore = defineStore('team', () => {
   // State - in memory only, fetched from server
@@ -10,6 +11,7 @@ export const useTeamStore = defineStore('team', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const mode = ref<CrudMode>('read')
+  const pagination = ref<PaginationMeta | null>(null)
 
   // Getters
   const getTeamById = computed(() => {
@@ -25,17 +27,30 @@ export const useTeamStore = defineStore('team', () => {
   })
 
   // Actions - All data from REST API
-  const fetchAll = async (refresh = false) => {
-    if (teams.value.length > 0 && !refresh) return
-
+  const fetchAll = async (page = 1, limit = 10, refresh = false) => {
+    // Ensure parameters are numbers
+    const pageNum = Number(page)
+    const limitNum = Number(limit)
+    
+    console.log(`Store.fetchAll called with: page=${page}, limit=${limit}`)
+    console.log(`Converted to: pageNum=${pageNum}, limitNum=${limitNum}, refresh=${refresh}`)
+    
     loading.value = true
     error.value = null
     try {
-      const resp = await teamService.getAll()
-      teams.value = resp.data
+      const response = await teamService.getAll(pageNum, limitNum)
+      console.log('Teams service response:', response)
+      console.log('Response pagination:', response.pagination)
+      
+      // For pagination, always replace data (don't append)
+      teams.value = response.data
+      pagination.value = response.pagination
+      
+      console.log('Updated teams count:', teams.value.length)
+      console.log('Updated pagination state:', pagination.value)
     } catch (err) {
       error.value = 'Failed to fetch teams from server'
-      console.error(err)
+      console.error('fetchAll error:', err)
       throw err
     } finally {
       loading.value = false
@@ -138,8 +153,8 @@ export const useTeamStore = defineStore('team', () => {
     error.value = null
   }
 
-  const refreshData = () => {
-    return fetchAll(true)
+  const refreshData = (page = 1, limit = 10) => {
+    return fetchAll(Number(page), Number(limit), true)
   }
 
   return {
@@ -149,6 +164,7 @@ export const useTeamStore = defineStore('team', () => {
     loading,
     error,
     mode,
+    pagination,
     // Getters  
     getTeamById,
     teamsByConference,

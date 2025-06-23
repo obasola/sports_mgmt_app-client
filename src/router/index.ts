@@ -8,10 +8,10 @@ import PlayerTeamDetail from '@/views/PlayerTeamDetail.vue'
 import CombineScoreDetail from '@/views/CombineScoreDetail.vue'
 import DraftPickDetail from '@/views/DraftPickDetail.vue'
 import ProspectDetail from '@/views/ProspectDetail.vue'
+import GameDetail from '@/views/GameDetail.vue'
+
+import ScheduleDetail from '@/views/scheduleDetail.vue'
 /*
-
-import ScheduleDetail from '@/views/ScheduleDetail.vue'
-
 import TeamNeedDetail from '@/views/TeamNeedDetail.vue'
 import PostSeasonResultDetail from '@/views/PostSeasonResultDetail.vue'
 */
@@ -58,8 +58,7 @@ const router = createRouter({
       name: 'ProspectDetail',
       component: ProspectDetail,
     },
-    /*
-    
+
     {
       path: '/schedules/:id?',
       name: 'ScheduleDetail',
@@ -70,6 +69,29 @@ const router = createRouter({
       name: 'PlayerAwardDetail',
       component: PlayerAwardDetail,
     },
+    // Add this route to your routes array
+    {
+      path: '/games/:id?',
+      name: 'GameDetail',
+      component: GameDetail,
+      meta: {
+        title: 'Games',
+        requiresAuth: true, // if you have authentication
+      },
+    },
+
+    // Alternative: Use lazy loading (recommended)
+    {
+      path: '/games/:id?',
+      name: 'GameDetail',
+      component: () => import('@/views/GameDetail.vue'),
+      meta: {
+        title: 'Games',
+        requiresAuth: true, // if you have authentication
+      },
+    },
+
+    /*
     {
       path: '/team-needs/:id?',
       name: 'TeamNeedDetail',

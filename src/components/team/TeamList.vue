@@ -1,7 +1,6 @@
-// src/components/team/TeamList.vue
-
+<!-- File: src/components/team/TeamList.vue -->
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTeamStore } from '@/stores/teamStore'
 import DataTable from 'primevue/datatable'
@@ -11,9 +10,52 @@ import Button from 'primevue/button'
 const teamStore = useTeamStore()
 const router = useRouter()
 
-onMounted(() => {
-  teamStore.fetchAll()
+// Pagination state - match what DataTable expects (0-based for PrimeVue)
+const currentPage = ref(0) // PrimeVue uses 0-based indexing
+const rowsPerPage = ref(10)
+
+// Computed for total records using correct backend field names
+const totalRecords = computed(() => {
+  return teamStore.pagination?.total || 0
 })
+
+// Computed for current backend page (1-based)
+const backendPage = computed(() => currentPage.value + 1)
+
+onMounted(() => {
+  console.log('Component mounted, fetching initial data')
+  teamStore.fetchAll(backendPage.value, rowsPerPage.value)
+})
+
+// Watch for pagination changes from the backend to sync UI (page only, not rows)
+watch(() => teamStore.pagination?.page, (newPage) => {
+  if (newPage) {
+    console.log('Backend page updated:', newPage)
+    // Only sync page number, not rows per page (let user control that)
+    const frontendPage = newPage - 1 // Convert to 0-based
+    if (currentPage.value !== frontendPage) {
+      currentPage.value = frontendPage
+    }
+  }
+})
+
+const onPageChange = (event: any) => {
+  console.log('Page change event:', event)
+  console.log('Event details - page:', event.page, 'rows:', event.rows)
+  
+  // Update local state
+  currentPage.value = event.page // PrimeVue page is 0-based
+  rowsPerPage.value = event.rows
+  
+  // Calculate 1-based page for backend
+  const backendPageNum = event.page + 1
+  
+  console.log(`Requesting backend: page=${backendPageNum}, limit=${event.rows}`)
+  console.log('Local state after update - currentPage:', currentPage.value, 'rowsPerPage:', rowsPerPage.value)
+  
+  // Fetch new data from backend
+  teamStore.fetchAll(backendPageNum, event.rows, true)
+}
 
 const viewTeam = (id: number) => {
   router.push(`/teams/${id}?mode=read`)
@@ -30,6 +72,8 @@ const createTeam = () => {
 const deleteTeam = async (id: number) => {
   if (confirm('Are you sure you want to delete this team?')) {
     await teamStore.remove(id)
+    // Refresh current page after deletion
+    await teamStore.fetchAll(backendPage.value, rowsPerPage.value, true)
   }
 }
 </script>
@@ -49,12 +93,16 @@ const deleteTeam = async (id: number) => {
     <DataTable
       :value="teamStore.teams"
       :loading="teamStore.loading"
+      lazy
       paginator
-      :rows="10"
+      :first="currentPage * rowsPerPage"
+      :rows="rowsPerPage"
+      :totalRecords="totalRecords"
       :rowsPerPageOptions="[5, 10, 20, 50]"
+      @page="onPageChange"
       responsiveLayout="scroll"
-      sortField="name"
-      :sortOrder="1"
+      paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} teams"
     >
       <Column field="name" header="Team Name" sortable />
       <Column field="city" header="City" sortable />
@@ -89,6 +137,17 @@ const deleteTeam = async (id: number) => {
         </template>
       </Column>
     </DataTable>
+
+    <!-- Debug info - remove after testing -->
+    <div v-if="teamStore.pagination" class="debug-info" style="margin-top: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 4px;">
+      <h4>Debug - Pagination Info:</h4>
+      <pre>{{ JSON.stringify(teamStore.pagination, null, 2) }}</pre>
+      <p>Frontend Current Page (0-based): {{ currentPage }}</p>
+      <p>Backend Page (1-based): {{ backendPage }}</p>
+      <p>Rows Per Page: {{ rowsPerPage }}</p>
+      <p>Total Records: {{ totalRecords }}</p>
+      <p>Teams Count: {{ teamStore.teams.length }}</p>
+    </div>
   </div>
 </template>
 
@@ -107,5 +166,10 @@ const deleteTeam = async (id: number) => {
 .action-buttons {
   display: flex;
   gap: 0.5rem;
+}
+
+.debug-info {
+  font-size: 0.8rem;
+  color: #666;
 }
 </style>

@@ -1,7 +1,6 @@
 // src/services/playerAwardService.ts
 import { apiService } from './api'
-import type { PlayerAward } from '@/types'
-import { ApiResponse } from './apiResponse'
+import type { ApiResponse, PlayerAward } from '@/types'
 
 export class PlayerAwardService {
   private readonly endpoint = '/player-awards'

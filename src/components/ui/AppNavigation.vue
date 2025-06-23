@@ -13,6 +13,11 @@ const menuItems = ref([
     command: () => router.push('/'),
   },
   {
+    label: 'Games',
+    icon: 'pi pi-calendar',
+    command: () => router.push('/games'),
+  },
+  {
     label: 'Players',
     icon: 'pi pi-users',
     command: () => router.push('/players'),

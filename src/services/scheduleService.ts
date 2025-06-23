@@ -1,12 +1,11 @@
-// File: src/services/teamService.ts
 import { apiService } from './api'
-import type { Team, PaginatedResponse, ApiResponse } from '@/types'
+import type { Schedule, ApiResponse, PaginatedResponse } from '@/types'
 
-export class TeamService {
-  private readonly endpoint = '/teams'
+export class ScheduleService {
+  private readonly endpoint = '/schedules'
 
-  async getAll(page = 1, limit = 10): Promise<PaginatedResponse<Team>> {
- 
+  // paginated-queries: Fix for double nesting on server
+  async getAll(page = 1, limit = 10): Promise<PaginatedResponse<Schedule>> {
     const pageNum = Number(page)
     const limitNum = Number(limit)
     
@@ -14,7 +13,7 @@ export class TeamService {
     const url = `${this.endpoint}?page=${pageNum}&limit=${limitNum}`
   
     try {
-      const response = await apiService.get<ApiResponse<Team[], any>>(url)
+      const response = await apiService.get<ApiResponse<Schedule[], any>>(url)
       
       // Check if backend respected our parameters
       const backendPage = response.data.pagination?.page
@@ -34,7 +33,6 @@ export class TeamService {
         pagination: response.data.pagination
       }
       
-      console.log('🎯 Returning to store:', result)
       return result
       
     } catch (error) {
@@ -43,38 +41,35 @@ export class TeamService {
     }
   }
 
-  async getById(id: number): Promise<Team> {
-    const response = await apiService.get<ApiResponse<Team>>(
+  // non-paginated queries: fix for double nesting from server
+  async getById(id: number): Promise<Schedule> {
+    const response = await apiService.get<ApiResponse<Schedule>>(
       `${this.endpoint}/${id}`
     )
     return response.data.data
   }
 
-  async getByName(name: string, page = 1, limit = 10): Promise<PaginatedResponse<Team>> {
-    const pageNum = Number(page)
-    const limitNum = Number(limit)
-    
-    // Build URL manually to avoid axios params encoding issues
-    const url = `${this.endpoint}/filter?name=${encodeURIComponent(name)}&page=${pageNum}&limit=${limitNum}`
-    console.log('🚀 Making filter request to:', url)
-    
-    const response = await apiService.get<ApiResponse<Team[], any>>(url)
-    return {
-      data: response.data.data,
-      pagination: response.data.pagination || null
-    }
-  }
-
-  async create(data: Omit<Team, 'id'>): Promise<Team> {
-    const response = await apiService.post<ApiResponse<Team>>(this.endpoint, data)
+  async getByTeam(teamId: number): Promise<Schedule[]> {
+    const response = await apiService.get<ApiResponse<Schedule[]>>(
+      `${this.endpoint}/team/${teamId}`
+    )
     return response.data.data
   }
 
-  async update(id: number, data: Partial<Team>): Promise<Team> {
-    const response = await apiService.put<ApiResponse<Team>>(
-      `${this.endpoint}/${id}`, 
-      data
+  async getBySeason(seasonYear: number): Promise<Schedule[]> {
+    const response = await apiService.get<ApiResponse<Schedule[]>>(
+      `${this.endpoint}/season/${seasonYear}`
     )
+    return response.data.data
+  }
+
+  async create(data: Omit<Schedule, 'id'>): Promise<Schedule> {
+    const response = await apiService.post<ApiResponse<Schedule>>(this.endpoint, data)
+    return response.data.data
+  }
+
+  async update(id: number, data: Partial<Schedule>): Promise<Schedule> {
+    const response = await apiService.put<ApiResponse<Schedule>>(`${this.endpoint}/${id}`, data)
     return response.data.data
   }
 
@@ -83,4 +78,4 @@ export class TeamService {
   }
 }
 
-export const teamService = new TeamService()
+export const scheduleService = new ScheduleService()

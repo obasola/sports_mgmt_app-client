@@ -1,5 +1,3 @@
-// src/components/team/TeamCreateForm.vue
-
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'

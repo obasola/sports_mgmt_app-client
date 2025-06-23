@@ -1,7 +1,7 @@
 // src/services/combineScoreService.ts
 import { apiService } from './api'
-import type { CombineScore } from '@/types'
-import { ApiResponse } from './apiResponse'
+import type { CombineScore, ApiResponse } from '@/types'
+
 
 export class CombineScoreService {
   private readonly endpoint = '/combine-scores'

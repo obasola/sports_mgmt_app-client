@@ -1,8 +1,6 @@
 // src/services/draftPickService.ts
 import { apiService } from './api'
-import type { DraftPick } from '@/types'
-import { ApiResponse } from './apiResponse'
-
+import type { DraftPick, ApiResponse } from '@/types'
 
 export class DraftPickService {
   private readonly endpoint = '/draft-picks'

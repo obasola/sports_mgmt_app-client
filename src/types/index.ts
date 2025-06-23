@@ -1,4 +1,63 @@
 // src/types/index.ts
+export interface ApiResponse<T, P = any> {
+  success: boolean
+  data: T
+  pagination?: P
+}
+
+export interface PaginatedResponse<T> {
+  data: T[]
+  pagination: PaginationMeta | null
+}
+
+// Updated to match your backend structure
+export interface PaginationMeta {
+  page: number        // Current page (1-based)
+  limit: number       // Items per page
+  total: number       // Total items
+  pages: number       // Total pages
+}
+export interface Game {
+  // Game fields
+  id: number;
+  seasonYear: string;
+  gameWeek?: number | null;
+  preseason?: number | null;
+  gameDate?: Date | string | null;
+  homeTeamId: number;
+  awayTeamId: number;
+  gameLocation?: string | null;
+  gameCity?: string | null;
+  gameStateProvince?: string | null;
+  gameCountry?: string | null;
+  homeScore?: number | null;
+  awayScore?: number | null;
+  gameStatus?: string | null;
+  createdAt?: Date | string | null;
+  updatedAt?: Date | string | null;
+  
+  // Relations
+  homeTeam: {
+    id: number;
+    name: string;
+    city?: string | null;
+    state?: string | null;
+    conference?: string | null;
+    division?: string | null;
+    stadium?: string | null;
+  };
+  
+  awayTeam: {
+    id: number;
+    name: string;
+    city?: string | null;
+    state?: string | null;
+    conference?: string | null;
+    division?: string | null;
+    stadium?: string | null;
+  };
+}
+
 export interface Player {
   id?: number
   firstName: string
@@ -18,6 +77,9 @@ export interface Player {
   pick?: DraftPick
   combineScore?: CombineScore
 }
+
+
+
 
 export interface PlayerAward {
   id?: number | undefined

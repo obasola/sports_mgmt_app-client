@@ -1,5 +1,3 @@
-// src/components/team/TeamEditForm.vue
-
 <script setup lang="ts">
 import { reactive, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'

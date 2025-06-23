@@ -1,7 +1,7 @@
 // src/services/prospectService.ts
 import { apiService } from './api'
-import type { Prospect } from '@/types'
-import { ApiResponse } from './apiResponse'
+import type { ApiResponse, Prospect } from '@/types'
+
 
 export class ProspectService {
   private readonly endpoint = '/prospects'
