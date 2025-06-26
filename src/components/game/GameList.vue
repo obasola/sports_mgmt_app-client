@@ -28,7 +28,7 @@ onMounted(async () => {
   try {
     await gameStore.fetchAll(1, rows.value)
     console.log('🔍 GameList: Initial data fetch successful')
-    
+
     // Debug: Check first game's team data structure
     if (gameStore.games.length > 0) {
       const firstGame = gameStore.games[0]
@@ -49,12 +49,12 @@ onMounted(async () => {
 const onPage = async (event: any) => {
   const page = event.page + 1 // PrimeVue uses 0-based, backend uses 1-based
   const limit = event.rows
-  
+
   console.log(`🔍 GameList: Page change event - page: ${page}, limit: ${limit}`)
-  
+
   first.value = event.first
   rows.value = limit
-  
+
   try {
     await gameStore.fetchAll(page, limit, false)
     console.log(`🔍 GameList: Successfully loaded page ${page}`)
@@ -66,14 +66,14 @@ const onPage = async (event: any) => {
 // ✅ Handle sorting events
 const onSort = async (event: any) => {
   console.log('🔍 GameList: Sort event:', event)
-  
+
   sortField.value = event.sortField
   sortOrder.value = event.sortOrder
-  
+
   // Reset to first page when sorting
   first.value = 0
   const page = 1
-  
+
   try {
     await gameStore.fetchAll(page, rows.value, false)
     console.log(`🔍 GameList: Successfully sorted by ${sortField.value}`)
@@ -87,7 +87,7 @@ const buildSortParams = () => {
   if (!sortField.value || sortOrder.value === 0) {
     return undefined
   }
-  
+
   const direction = sortOrder.value === 1 ? 'asc' : 'desc'
   return {
     sortBy: sortField.value,
@@ -104,7 +104,7 @@ const editGame = (id: number) => {
 }
 
 const createGame = () => {
-   showCreateModal.value = true
+  showCreateModal.value = true
 }
 
 const deleteGame = async (id: number) => {
@@ -155,15 +155,33 @@ const formatMatchup = (game: any) => {
 const onGameCreated = (newGame: any) => {
 
   showCreateModal.value = false
-  
+
   // Optional: Refresh games list
   gameStore.fetchAll()
-  
+
   // Optional: Navigate to the new game
   // router.push(`/games/${newGame.id}`)
-  
+
   // Optional: Show success message
   // toast.add({ severity: 'success', summary: 'Success', detail: 'Game created successfully!' })
+}
+
+const getTeamShortNameAndLogo = (team: any): { shortName: string; logoPath: string } => {
+  if (!team || !team.name || !team.conference) {
+    return { shortName: 'Unknown', logoPath: '' }
+  }
+
+  const nameParts = team.name.trim().split(' ')
+  const shortName = nameParts[nameParts.length - 1]
+  const fileExt = shortName === 'Chargers' ? 'webp' : 'avif'
+  const logoFile = `${shortName}.${fileExt}`
+  const logoPath = new URL(`../../assets/images/${team.conference.toLowerCase()}/${logoFile}`, import.meta.url).href
+  console.log("logoPath: "+logoPath)
+  return { shortName, logoPath }
+}
+
+const cancelRequest = () => {
+  alert('BTN CLICKED!')
 }
 </script>
 
@@ -171,79 +189,45 @@ const onGameCreated = (newGame: any) => {
   <div class="game-list">
     <div class="list-header">
       <h2>Games</h2>
-      <Button
-        @click="createGame"
-        label="Create Game"
-        icon="pi pi-plus"
-        class="p-button-success"
-      />
+      <Button @click="createGame" label="Create Game" icon="pi pi-plus" class="p-button-success" />
     </div>
 
     <!-- Error Message -->
-    <Message 
-      v-if="gameStore.error" 
-      severity="error" 
-      :closable="false"
-      class="mb-3"
-    >
+    <Message v-if="gameStore.error" severity="error" :closable="false" class="mb-3">
       <div class="flex justify-content-between align-items-center">
         <span>{{ gameStore.error }}</span>
-        <Button 
-          label="Retry" 
-          icon="pi pi-refresh" 
-          class="p-button-sm p-button-outlined"
-          @click="retryFetch"
-        />
+        <Button label="Retry" icon="pi pi-refresh" class="p-button-sm p-button-outlined" @click="retryFetch" />
       </div>
     </Message>
 
     <!-- Debug Info (remove in production) -->
-    <Message 
-      v-if="gameStore.games.length === 0 && !gameStore.loading && !gameStore.error" 
-      severity="info" 
-      class="mb-3"
-    >
+    <Message v-if="gameStore.games.length === 0 && !gameStore.loading && !gameStore.error" severity="info" class="mb-3">
       No games found. Total records: {{ gameStore.pagination?.total || 0 }}
       <br>
       <small>API endpoint: <code>/games?page=1&limit=10</code></small>
     </Message>
 
     <!-- Team Data Debug (remove in production) -->
-    <Message 
-      v-if="gameStore.games.length > 0 && gameStore.games[0] && (!gameStore.games[0].homeTeam || !gameStore.games[0].awayTeam)" 
-      severity="warn" 
-      class="mb-3"
-    >
+    <Message
+      v-if="gameStore.games.length > 0 && gameStore.games[0] && (!gameStore.games[0].homeTeam || !gameStore.games[0].awayTeam)"
+      severity="warn" class="mb-3">
       ⚠️ Team relationship data missing. First game data:
       <br>
       <small>
-        homeTeamId: {{ gameStore.games[0]?.homeTeamId }} | 
-        awayTeamId: {{ gameStore.games[0]?.awayTeamId }} | 
-        homeTeam: {{ gameStore.games[0]?.homeTeam ? 'present' : 'missing' }} | 
+        homeTeamId: {{ gameStore.games[0]?.homeTeamId }} |
+        awayTeamId: {{ gameStore.games[0]?.awayTeamId }} |
+        homeTeam: {{ gameStore.games[0]?.homeTeam ? 'present' : 'missing' }} |
         awayTeam: {{ gameStore.games[0]?.awayTeam ? 'present' : 'missing' }}
       </small>
     </Message>
 
-    <DataTable
-      :value="gameStore.games"
-      :loading="gameStore.loading"
-      :lazy="true"
-      paginator
-      :rows="rows"
-      :first="first"
-      :totalRecords="gameStore.pagination?.total || 0"
-      :rowsPerPageOptions="[5, 10, 20, 50]"
-      @page="onPage"
-      @sort="onSort"
-      :sortField="sortField"
-      :sortOrder="sortOrder"
-      responsiveLayout="scroll"
-      sortMode="single"
-      :globalFilterFields="['seasonYear', 'homeTeam.name', 'awayTeam.name', 'gameLocation']"
-    >
+    <DataTable :value="gameStore.games" :loading="gameStore.loading" :lazy="true" paginator :rows="rows" :first="first"
+      :totalRecords="gameStore.pagination?.total || 0" :rowsPerPageOptions="[5, 10, 20, 50]" @page="onPage"
+      @sort="onSort" :sortField="sortField" :sortOrder="sortOrder" responsiveLayout="scroll" sortMode="single"
+      :globalFilterFields="['seasonYear', 'homeTeam.name', 'awayTeam.name', 'gameLocation']">
       <!-- Season Year -->
       <Column field="seasonYear" header="Season" sortable />
-      
+
       <!-- Week -->
       <Column header="Week" sortable>
         <template #body="{ data }">
@@ -252,7 +236,7 @@ const onGameCreated = (newGame: any) => {
           <span v-else>-</span>
         </template>
       </Column>
-      
+
       <!-- Date -->
       <Column field="gameDate" header="Date" sortable>
         <template #body="{ data }">
@@ -262,14 +246,27 @@ const onGameCreated = (newGame: any) => {
           <span v-else>TBD</span>
         </template>
       </Column>
-      
+
       <!-- Matchup -->
       <Column header="Matchup">
         <template #body="{ data }">
-          {{ formatMatchup(data) }}
+          <div class="matchup-cell">
+            <div class="team">
+              <img v-if="data.awayTeam" :src="getTeamShortNameAndLogo(data.awayTeam).logoPath"
+                :alt="getTeamShortNameAndLogo(data.awayTeam).shortName" class="team-logo" />
+              <span>{{ getTeamShortNameAndLogo(data.awayTeam).shortName }}</span>
+            </div>
+            <span class="at-symbol">@</span>
+            <div class="team">
+              <img v-if="data.homeTeam" :src="getTeamShortNameAndLogo(data.homeTeam).logoPath"
+                :alt="getTeamShortNameAndLogo(data.homeTeam).shortName" class="team-logo" />
+              <span>{{ getTeamShortNameAndLogo(data.homeTeam).shortName }}</span>
+            </div>
+          </div>
         </template>
       </Column>
-      
+
+
       <!-- Score -->
       <Column header="Score">
         <template #body="{ data }">
@@ -279,66 +276,46 @@ const onGameCreated = (newGame: any) => {
           <span v-else class="text-muted">-</span>
         </template>
       </Column>
-      
+
       <!-- Location -->
       <Column field="gameLocation" header="Location">
         <template #body="{ data }">
           <span v-if="data.gameLocation">{{ data.gameLocation }}</span>
-          <span v-else-if="data.gameCity && data.gameStateProvince">{{ data.gameCity }}, {{ data.gameStateProvince }}</span>
+          <span v-else-if="data.gameCity && data.gameStateProvince">{{ data.gameCity }}, {{ data.gameStateProvince
+            }}</span>
           <span v-else-if="data.gameCity">{{ data.gameCity }}</span>
           <span v-else-if="data.homeTeam && data.homeTeam.city">{{ data.homeTeam.city }}</span>
           <span v-else class="text-muted">TBD</span>
         </template>
       </Column>
-      
+
       <!-- Status -->
       <Column field="gameStatus" header="Status" sortable>
         <template #body="{ data }">
           <span>{{ data.gameStatus || 'SCHEDULED' }}</span>
         </template>
       </Column>
-      
+
       <!-- Actions -->
       <Column header="Actions">
         <template #body="{ data }">
           <div class="action-buttons">
-            <Button
-              @click="viewGame(data.id)"
-              icon="pi pi-eye"
-              class="p-button-info p-button-sm"
-              v-tooltip="'View'"
-            />
-            <Button
-              @click="editGame(data.id)"
-              icon="pi pi-pencil"
-              class="p-button-warning p-button-sm"
-              v-tooltip="'Edit'"
-            />
-            <Button
-              @click="deleteGame(data.id)"
-              icon="pi pi-trash"
-              class="p-button-danger p-button-sm"
-              v-tooltip="'Delete'"
-            />
+            <Button @click="viewGame(data.id)" icon="pi pi-eye" class="p-button-info p-button-sm" v-tooltip="'View'" />
+            <Button @click="editGame(data.id)" icon="pi pi-pencil" class="p-button-warning p-button-sm"
+              v-tooltip="'Edit'" />
+            <Button @click="deleteGame(data.id)" icon="pi pi-trash" class="p-button-danger p-button-sm"
+              v-tooltip="'Delete'" />
           </div>
         </template>
       </Column>
     </DataTable>
-     <!-- ✅ Create Game Modal -->
-    <Dialog
-      v-model:visible="showCreateModal"
-      modal
-      header="Create New Game"
-      :style="{ width: '50rem' }"
-      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
-    >
-      <GameCreateForm 
-        @game-created="onGameCreated"
-        @cancel="alert('BTN CLICKED!')"
-      />
+    <!-- ✅ Create Game Modal -->
+    <Dialog v-model:visible="showCreateModal" modal header="Create New Game" :style="{ width: '50rem' }"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+      <GameCreateForm @game-created="onGameCreated" @cancel="cancelRequest" />
     </Dialog>
   </div>
-  
+
 </template>
 
 <style scoped>
@@ -366,4 +343,28 @@ const onGameCreated = (newGame: any) => {
 .mb-3 {
   margin-bottom: 1rem;
 }
+.matchup-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.team-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.at-symbol {
+  font-weight: bold;
+  margin: 0 0.25rem;
+}
+
 </style>

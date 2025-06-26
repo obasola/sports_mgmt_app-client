@@ -225,7 +225,10 @@
 import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import { useTeamStore } from '@/stores/teamStore'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
+const gameId = computed(() => route.params.id)
 // Props
 interface Props {
   gameId?: number | string
@@ -385,20 +388,21 @@ watch(() => formData.homeTeamId, () => {
 
 const loadGameData = async () => {
   if (props.initialData) {
-    // Use provided initial data
     populateForm(props.initialData)
-  } else if (props.gameId) {
-    // Fetch data by ID
+  } else if (gameId.value) {
     try {
-      const game = await gameStore.getGameById(Number(props.gameId))
+      const game = await gameStore.getGameById(Number(gameId.value))
       if (game) {
         populateForm(game)
       }
     } catch (error) {
       console.error('Error loading game data:', error)
     }
+  } else {
+    alert('Error: no initial data or id to fetch by')
   }
 }
+
 
 const populateForm = (game: any) => {
   formData.id = game.id

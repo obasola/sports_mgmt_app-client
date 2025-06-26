@@ -18,10 +18,10 @@ onMounted(async () => {
 const formatDate = (date: Date | string | undefined) => {
   if (!date) return 'TBD'
   const d = new Date(date)
-  return d.toLocaleDateString('en-US', { 
+  return d.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
-    month: 'long', 
+    month: 'long',
     day: 'numeric'
   })
 }
@@ -29,7 +29,7 @@ const formatDate = (date: Date | string | undefined) => {
 const formatTime = (date: Date | string | undefined) => {
   if (!date) return ''
   const d = new Date(date)
-  return d.toLocaleTimeString('en-US', { 
+  return d.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
@@ -48,15 +48,27 @@ const getGameStatusSeverity = (status: string | undefined) => {
   }
 }
 
+const getTeamLogo = (team: any): string => {
+  if (!team || !team.name || !team.conference) return ''
+
+  const lastWord = team.name.trim().split(' ').pop()
+  const ext = lastWord === 'Chargers' ? 'webp' : 'avif'
+
+  return new URL(
+    `../../assets/images/${team.conference.toLowerCase()}/${lastWord}.${ext}`,
+    import.meta.url
+  ).href
+}
+
 const getGameResult = computed(() => {
-  if (!game.value || game.value.homeScore === null || game.value.homeScore === undefined || 
-      game.value.awayScore === null || game.value.awayScore === undefined) {
+  if (!game.value || game.value.homeScore === null || game.value.homeScore === undefined ||
+    game.value.awayScore === null || game.value.awayScore === undefined) {
     return null
   }
-  
+
   const homeScore = game.value.homeScore
   const awayScore = game.value.awayScore
-  
+
   if (homeScore > awayScore) {
     return { winner: 'home', margin: homeScore - awayScore }
   } else if (awayScore > homeScore) {
@@ -68,7 +80,7 @@ const getGameResult = computed(() => {
 
 const getWeekDisplay = computed(() => {
   if (!game.value) return ''
-  
+
   if (game.value.preseason) {
     return `Preseason Week ${game.value.preseason}`
   } else if (game.value.gameWeek) {
@@ -84,14 +96,16 @@ const getWeekDisplay = computed(() => {
       <div class="game-title">
         <div class="matchup-header">
           <div class="team-info">
-            <h3>{{ game.awayTeam.name }}</h3>
+            <h3 class="team-name-with-logo">
+              <img :src="getTeamLogo(game.awayTeam)" :alt="game.awayTeam.name" class="inline-logo" />
+              {{ game.awayTeam.name }}
+            </h3>
             <p class="team-location">{{ game.awayTeam.city }}, {{ game.awayTeam.state }}</p>
           </div>
-          
+
           <div class="score-display">
-            <div v-if="game.homeScore !== null && game.homeScore !== undefined && 
-                      game.awayScore !== null && game.awayScore !== undefined" 
-                 class="final-score">
+            <div v-if="game.homeScore !== null && game.homeScore !== undefined &&
+              game.awayScore !== null && game.awayScore !== undefined" class="final-score">
               <div class="away-score" :class="{ 'winner': getGameResult?.winner === 'away' }">
                 {{ game.awayScore }}
               </div>
@@ -102,15 +116,20 @@ const getWeekDisplay = computed(() => {
             </div>
             <div v-else class="vs-display">VS</div>
           </div>
-          
+
           <div class="team-info">
-            <h3>{{ game.homeTeam.name }}</h3>
+
+            <h3 class="team-name-with-logo">
+              <img :src="getTeamLogo(game.homeTeam)" :alt="game.homeTeam.name" class="inline-logo" />
+              {{ game.homeTeam.name }}
+            </h3>
             <p class="team-location">{{ game.homeTeam.city }}, {{ game.homeTeam.state }}</p>
           </div>
         </div>
-        
+
         <div class="game-meta">
-          <Tag :value="game.gameStatus || 'SCHEDULED'" :severity="getGameStatusSeverity(game.gameStatus)" />
+          <Tag :value="game.gameStatus || 'SCHEDULED'"
+            :severity="getGameStatusSeverity(game.gameStatus ?? undefined)" />
           <span class="season-info">{{ game.seasonYear }} • {{ getWeekDisplay }}</span>
         </div>
       </div>
@@ -123,11 +142,11 @@ const getWeekDisplay = computed(() => {
           <h3>Game Information</h3>
           <div class="info-row">
             <span class="label">Date:</span>
-            <span class="data-value">{{ formatDate(game.gameDate) }}</span>
+            <span class="data-value">{{ formatDate(game.gameDate ?? undefined) }}</span>
           </div>
           <div class="info-row">
             <span class="label">Time:</span>
-            <span class="data-value">{{ formatTime(game.gameDate) || 'TBD' }}</span>
+            <span class="data-value">{{ formatTime(game.gameDate ?? undefined) || 'TBD' }}</span>
           </div>
           <div class="info-row">
             <span class="label">Season:</span>
@@ -139,7 +158,8 @@ const getWeekDisplay = computed(() => {
           </div>
           <div class="info-row">
             <span class="label">Status:</span>
-            <Tag :value="game.gameStatus || 'SCHEDULED'" :severity="getGameStatusSeverity(game.gameStatus)" />
+            <Tag :value="game.gameStatus || 'SCHEDULED'"
+              :severity="getGameStatusSeverity(game.gameStatus ?? undefined)" />
           </div>
         </div>
 
@@ -184,7 +204,7 @@ const getWeekDisplay = computed(() => {
               </span>
             </div>
             <div v-if="getGameResult && getGameResult.winner !== 'tie'" class="game-result">
-              {{ getGameResult.winner === 'home' ? game.homeTeam.name : game.awayTeam.name }} 
+              {{ getGameResult.winner === 'home' ? game.homeTeam.name : game.awayTeam.name }}
               wins by {{ getGameResult.margin }}
             </div>
             <div v-else-if="getGameResult?.winner === 'tie'" class="game-result">
@@ -326,11 +346,13 @@ const getWeekDisplay = computed(() => {
   color: var(--text-secondary);
 }
 
-.away-score, .home-score {
+.away-score,
+.home-score {
   color: var(--text-primary);
 }
 
-.away-score.winner, .home-score.winner {
+.away-score.winner,
+.home-score.winner {
   color: var(--primary-color);
 }
 
@@ -440,5 +462,19 @@ const getWeekDisplay = computed(() => {
 /* Ensure TBD and fallback text maintains secondary styling */
 .text-500 {
   color: var(--text-secondary) !important;
+}
+
+.inline-logo {
+  width: 60px;
+  height: 60px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  object-fit: contain;
+}
+
+.team-name-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>
