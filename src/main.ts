@@ -2,6 +2,11 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
+// Import global form styles
+import './assets/styles/global-forms.css'           // For HTML forms
+import './assets/styles/global-info-display.css'   // For info displays  
+import './assets/styles/global-primevue-enhancements.css' // For PrimeVue components
+
 
 // PrimeVue
 import PrimeVue from 'primevue/config'

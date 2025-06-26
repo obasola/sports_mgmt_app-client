@@ -1,0 +1,514 @@
+/* ==================================================
+   GLOBAL ENHANCED FORM STYLES
+   ================================================== */
+
+/* CSS Custom Properties for Form Theming */
+:root {
+  /* If not already defined, add these fallbacks */
+  --primary-color: #3b82f6;
+  --primary-hover-color: #2563eb;
+  --primary-color-rgb: 59, 130, 246;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #d1d5db;
+  --surface-100: #f3f4f6;
+  --surface-200: #e5e7eb;
+  --hover-color: #f9fafb;
+  
+  /* Form-specific variables */
+  --form-border-radius: 4px;
+  --form-transition: all 0.2s ease;
+  --form-shadow-focus: 0 0 0 2px rgba(var(--primary-color-rgb), 0.1);
+  --form-shadow-hover: 0 2px 8px rgba(var(--primary-color-rgb), 0.3);
+}
+
+/* ==================================================
+   ENHANCED FORM INPUTS
+   ================================================== */
+
+/* Base form input styling */
+.form-input,
+.enhanced-input,
+input[type="text"]:not(.no-enhance),
+input[type="email"]:not(.no-enhance),
+input[type="password"]:not(.no-enhance),
+input[type="number"]:not(.no-enhance),
+input[type="tel"]:not(.no-enhance),
+input[type="url"]:not(.no-enhance),
+input[type="search"]:not(.no-enhance),
+input[type="date"]:not(.no-enhance),
+input[type="datetime-local"]:not(.no-enhance),
+input[type="time"]:not(.no-enhance),
+textarea:not(.no-enhance),
+select:not(.no-enhance) {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--form-border-radius);
+  font-size: 1rem;
+  color: var(--primary-color);
+  font-weight: 500;
+  background-color: white;
+  transition: var(--form-transition);
+}
+
+/* Placeholder styling */
+.form-input::placeholder,
+.enhanced-input::placeholder,
+input:not(.no-enhance)::placeholder,
+textarea:not(.no-enhance)::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+/* Focus states */
+.form-input:focus,
+.enhanced-input:focus,
+input:not(.no-enhance):focus,
+textarea:not(.no-enhance):focus,
+select:not(.no-enhance):focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: var(--form-shadow-focus);
+}
+
+/* Hover states */
+.form-input:hover:not(:disabled),
+.enhanced-input:hover:not(:disabled),
+input:not(.no-enhance):hover:not(:disabled),
+textarea:not(.no-enhance):hover:not(:disabled),
+select:not(.no-enhance):hover:not(:disabled) {
+  border-color: var(--primary-color);
+}
+
+/* Disabled states */
+.form-input:disabled,
+.enhanced-input:disabled,
+input:not(.no-enhance):disabled,
+textarea:not(.no-enhance):disabled,
+select:not(.no-enhance):disabled {
+  background-color: #f5f5f5;
+  color: #666;
+  cursor: not-allowed;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* ==================================================
+   SELECT DROPDOWN STYLING
+   ================================================== */
+
+/* Select option styling */
+.form-input option[value=""],
+.enhanced-input option[value=""],
+select:not(.no-enhance) option[value=""] {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.form-input option:not([value=""]),
+.enhanced-input option:not([value=""]),
+select:not(.no-enhance) option:not([value=""]) {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* ==================================================
+   FORM LAYOUT & CONTAINERS
+   ================================================== */
+
+/* Form grid layout */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* Form sections */
+.form-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.form-section h3 {
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+/* Form rows */
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Enhanced form row with hover effects */
+.form-row:hover .form-input:not(:disabled),
+.form-row:hover .enhanced-input:not(:disabled),
+.form-row:hover input:not(.no-enhance):not(:disabled),
+.form-row:hover textarea:not(.no-enhance):not(:disabled),
+.form-row:hover select:not(.no-enhance):not(:disabled) {
+  transform: translateX(2px);
+}
+
+/* ==================================================
+   FORM LABELS
+   ================================================== */
+
+.form-label,
+.form-row label,
+label.enhanced-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+/* Required field indicator */
+.form-label.required::after,
+.form-row label.required::after,
+label.enhanced-label.required::after {
+  content: " *";
+  color: #ef4444;
+}
+
+/* ==================================================
+   FORM NOTES & HELPER TEXT
+   ================================================== */
+
+.form-note,
+.help-text,
+small.form-help {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Error states */
+.form-note.error,
+.help-text.error {
+  color: #ef4444;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* Success states */
+.form-note.success,
+.help-text.success {
+  color: #10b981;
+  font-style: normal;
+  font-weight: 500;
+}
+
+/* ==================================================
+   RADIO BUTTONS & CHECKBOXES
+   ================================================== */
+
+.radio-group,
+.checkbox-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.radio-label,
+.checkbox-label,
+label.enhanced-radio,
+label.enhanced-checkbox {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: normal !important;
+  margin-bottom: 0 !important;
+  color: var(--text-primary);
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.radio-label input,
+.checkbox-label input,
+label.enhanced-radio input,
+label.enhanced-checkbox input {
+  width: auto;
+  accent-color: var(--primary-color);
+}
+
+/* Checked state styling */
+.radio-label:has(input:checked),
+.checkbox-label:has(input:checked),
+label.enhanced-radio:has(input:checked),
+label.enhanced-checkbox:has(input:checked) {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* ==================================================
+   FORM BUTTONS
+   ================================================== */
+
+/* Primary button */
+.btn-primary,
+.form-submit,
+button[type="submit"]:not(.no-enhance) {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: var(--primary-color);
+  color: white;
+  border-radius: var(--form-border-radius);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: var(--form-transition);
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-primary:hover,
+.form-submit:hover,
+button[type="submit"]:not(.no-enhance):hover {
+  background: var(--primary-hover-color);
+  transform: translateY(-1px);
+  box-shadow: var(--form-shadow-hover);
+}
+
+/* Secondary button */
+.btn-secondary,
+.form-cancel,
+button[type="button"]:not(.no-enhance) {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-primary);
+  border-radius: var(--form-border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: var(--form-transition);
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-secondary:hover,
+.form-cancel:hover,
+button[type="button"]:not(.no-enhance):hover {
+  background: var(--surface-100);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Button group */
+.form-actions,
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: 2rem;
+}
+
+.form-actions.left,
+.button-group.left {
+  justify-content: flex-start;
+}
+
+.form-actions.center,
+.button-group.center {
+  justify-content: center;
+}
+
+.form-actions.spread,
+.button-group.spread {
+  justify-content: space-between;
+}
+
+/* ==================================================
+   SPECIALIZED INPUT TYPES
+   ================================================== */
+
+/* Date picker styling */
+input[type="datetime-local"]:not(.no-enhance)::-webkit-calendar-picker-indicator,
+input[type="date"]:not(.no-enhance)::-webkit-calendar-picker-indicator,
+input[type="time"]:not(.no-enhance)::-webkit-calendar-picker-indicator {
+  filter: hue-rotate(200deg);
+  cursor: pointer;
+}
+
+/* File input styling */
+input[type="file"]:not(.no-enhance) {
+  padding: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
+input[type="file"]:not(.no-enhance)::file-selector-button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--form-border-radius);
+  margin-right: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* Range input styling */
+input[type="range"]:not(.no-enhance) {
+  accent-color: var(--primary-color);
+}
+
+/* ==================================================
+   FORM VALIDATION STATES
+   ================================================== */
+
+/* Error states */
+.form-input.error,
+.enhanced-input.error,
+input.error:not(.no-enhance),
+textarea.error:not(.no-enhance),
+select.error:not(.no-enhance) {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+}
+
+/* Success states */
+.form-input.success,
+.enhanced-input.success,
+input.success:not(.no-enhance),
+textarea.success:not(.no-enhance),
+select.success:not(.no-enhance) {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+}
+
+/* Warning states */
+.form-input.warning,
+.enhanced-input.warning,
+input.warning:not(.no-enhance),
+textarea.warning:not(.no-enhance),
+select.warning:not(.no-enhance) {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1);
+}
+
+/* ==================================================
+   RESPONSIVE DESIGN
+   ================================================== */
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .form-section {
+    padding: 1rem;
+  }
+  
+  .form-actions,
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .btn-primary,
+  .btn-secondary,
+  .form-submit,
+  .form-cancel {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ==================================================
+   UTILITY CLASSES
+   ================================================== */
+
+/* Disable enhancements for specific elements */
+.no-enhance {
+  /* This class prevents the global styling from being applied */
+}
+
+/* Enhanced form container */
+.enhanced-form {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Form loading state */
+.form-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.form-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inline form styling */
+.form-inline {
+  display: flex;
+  gap: 1rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.form-inline .form-row {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 200px;
+}
+
+/* ==================================================
+   DARK MODE SUPPORT (Optional)
+   ================================================== */
+
+@media (prefers-color-scheme: dark) {
+  .dark-mode {
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border-color: #374151;
+    --surface-100: #374151;
+    --surface-200: #4b5563;
+    --hover-color: #1f2937;
+  }
+  
+  .dark-mode .form-input,
+  .dark-mode .enhanced-input,
+  .dark-mode input:not(.no-enhance),
+  .dark-mode textarea:not(.no-enhance),
+  .dark-mode select:not(.no-enhance) {
+    background-color: #1f2937;
+    border-color: var(--border-color);
+  }
+  
+  .dark-mode .form-section {
+    background: #1f2937;
+    border-color: var(--border-color);
+  }
+}

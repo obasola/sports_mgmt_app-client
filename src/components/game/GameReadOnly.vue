@@ -1,4 +1,3 @@
-<!-- src/components/game/GameReadOnly.vue -->
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
@@ -124,19 +123,19 @@ const getWeekDisplay = computed(() => {
           <h3>Game Information</h3>
           <div class="info-row">
             <span class="label">Date:</span>
-            <span>{{ formatDate(game.gameDate) }}</span>
+            <span class="data-value">{{ formatDate(game.gameDate) }}</span>
           </div>
           <div class="info-row">
             <span class="label">Time:</span>
-            <span>{{ formatTime(game.gameDate) || 'TBD' }}</span>
+            <span class="data-value">{{ formatTime(game.gameDate) || 'TBD' }}</span>
           </div>
           <div class="info-row">
             <span class="label">Season:</span>
-            <span>{{ game.seasonYear }}</span>
+            <span class="data-value">{{ game.seasonYear }}</span>
           </div>
           <div class="info-row">
             <span class="label">Week:</span>
-            <span>{{ getWeekDisplay }}</span>
+            <span class="data-value">{{ getWeekDisplay }}</span>
           </div>
           <div class="info-row">
             <span class="label">Status:</span>
@@ -149,19 +148,19 @@ const getWeekDisplay = computed(() => {
           <h3>Location</h3>
           <div class="info-row" v-if="game.gameLocation">
             <span class="label">Venue:</span>
-            <span>{{ game.gameLocation }}</span>
+            <span class="data-value">{{ game.gameLocation }}</span>
           </div>
           <div class="info-row" v-if="game.gameCity">
             <span class="label">City:</span>
-            <span>{{ game.gameCity }}</span>
+            <span class="data-value">{{ game.gameCity }}</span>
           </div>
           <div class="info-row" v-if="game.gameStateProvince">
             <span class="label">State/Province:</span>
-            <span>{{ game.gameStateProvince }}</span>
+            <span class="data-value">{{ game.gameStateProvince }}</span>
           </div>
           <div class="info-row" v-if="game.gameCountry">
             <span class="label">Country:</span>
-            <span>{{ game.gameCountry }}</span>
+            <span class="data-value">{{ game.gameCountry }}</span>
           </div>
           <div v-if="!game.gameLocation && !game.gameCity" class="text-500">
             Location TBD
@@ -199,15 +198,15 @@ const getWeekDisplay = computed(() => {
           <h3>System Information</h3>
           <div class="info-row">
             <span class="label">Game ID:</span>
-            <span>{{ game.id }}</span>
+            <span class="data-value">{{ game.id }}</span>
           </div>
           <div class="info-row" v-if="game.createdAt">
             <span class="label">Created:</span>
-            <span>{{ formatDate(game.createdAt) }}</span>
+            <span class="data-value">{{ formatDate(game.createdAt) }}</span>
           </div>
           <div class="info-row" v-if="game.updatedAt">
             <span class="label">Last Updated:</span>
-            <span>{{ formatDate(game.updatedAt) }}</span>
+            <span class="data-value">{{ formatDate(game.updatedAt) }}</span>
           </div>
         </div>
       </div>
@@ -218,27 +217,27 @@ const getWeekDisplay = computed(() => {
           <div class="team-details">
             <div class="info-row">
               <span class="label">Team Name:</span>
-              <span>{{ game.homeTeam.name }}</span>
+              <span class="data-value">{{ game.homeTeam.name }}</span>
             </div>
             <div class="info-row" v-if="game.homeTeam.city">
               <span class="label">City:</span>
-              <span>{{ game.homeTeam.city }}</span>
+              <span class="data-value">{{ game.homeTeam.city }}</span>
             </div>
             <div class="info-row" v-if="game.homeTeam.state">
               <span class="label">State:</span>
-              <span>{{ game.homeTeam.state }}</span>
+              <span class="data-value">{{ game.homeTeam.state }}</span>
             </div>
             <div class="info-row" v-if="game.homeTeam.conference">
               <span class="label">Conference:</span>
-              <span>{{ game.homeTeam.conference }}</span>
+              <span class="data-value">{{ game.homeTeam.conference }}</span>
             </div>
             <div class="info-row" v-if="game.homeTeam.division">
               <span class="label">Division:</span>
-              <span>{{ game.homeTeam.division }}</span>
+              <span class="data-value">{{ game.homeTeam.division }}</span>
             </div>
             <div class="info-row" v-if="game.homeTeam.stadium">
               <span class="label">Stadium:</span>
-              <span>{{ game.homeTeam.stadium }}</span>
+              <span class="data-value">{{ game.homeTeam.stadium }}</span>
             </div>
           </div>
         </AccordionTab>
@@ -248,27 +247,27 @@ const getWeekDisplay = computed(() => {
           <div class="team-details">
             <div class="info-row">
               <span class="label">Team Name:</span>
-              <span>{{ game.awayTeam.name }}</span>
+              <span class="data-value">{{ game.awayTeam.name }}</span>
             </div>
             <div class="info-row" v-if="game.awayTeam.city">
               <span class="label">City:</span>
-              <span>{{ game.awayTeam.city }}</span>
+              <span class="data-value">{{ game.awayTeam.city }}</span>
             </div>
             <div class="info-row" v-if="game.awayTeam.state">
               <span class="label">State:</span>
-              <span>{{ game.awayTeam.state }}</span>
+              <span class="data-value">{{ game.awayTeam.state }}</span>
             </div>
             <div class="info-row" v-if="game.awayTeam.conference">
               <span class="label">Conference:</span>
-              <span>{{ game.awayTeam.conference }}</span>
+              <span class="data-value">{{ game.awayTeam.conference }}</span>
             </div>
             <div class="info-row" v-if="game.awayTeam.division">
               <span class="label">Division:</span>
-              <span>{{ game.awayTeam.division }}</span>
+              <span class="data-value">{{ game.awayTeam.division }}</span>
             </div>
             <div class="info-row" v-if="game.awayTeam.stadium">
               <span class="label">Stadium:</span>
-              <span>{{ game.awayTeam.stadium }}</span>
+              <span class="data-value">{{ game.awayTeam.stadium }}</span>
             </div>
           </div>
         </AccordionTab>
@@ -377,6 +376,13 @@ const getWeekDisplay = computed(() => {
   color: var(--text-primary);
 }
 
+/* Enhanced data value styling */
+.data-value {
+  color: var(--primary-color);
+  font-weight: 500;
+  font-size: 1.05em;
+}
+
 .score-breakdown {
   text-align: center;
 }
@@ -391,13 +397,20 @@ const getWeekDisplay = computed(() => {
   border-radius: 4px;
 }
 
+.team-score .team-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
 .team-score .score {
   font-size: 1.5rem;
   font-weight: bold;
+  color: var(--primary-color);
 }
 
 .team-score .score.winner {
   color: var(--primary-color);
+  text-shadow: 0 0 8px rgba(var(--primary-color-rgb, 59, 130, 246), 0.3);
 }
 
 .game-result {
@@ -415,5 +428,17 @@ const getWeekDisplay = computed(() => {
 
 .team-details {
   padding: 1rem 0;
+}
+
+/* Additional enhancement for better visual hierarchy */
+.info-row:hover .data-value {
+  color: var(--primary-color);
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+
+/* Ensure TBD and fallback text maintains secondary styling */
+.text-500 {
+  color: var(--text-secondary) !important;
 }
 </style>

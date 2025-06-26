@@ -8,6 +8,8 @@ import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import Dialog from 'primevue/dialog'
+import GameCreateForm from '@/components/game/GameCreateForm.vue'
+import GameEditForm from '@/components/game/GameEditForm.vue'
 
 const gameStore = useGameStore()
 const router = useRouter()
@@ -15,6 +17,9 @@ const router = useRouter()
 // Pagination refs
 const rows = ref(10)
 const first = ref(0)
+// ✅ Sorting refs
+const sortField = ref('')
+const sortOrder = ref(0) // 0 = none, 1 = asc, -1 = desc
 // ✅ Modal visibility control
 const showCreateModal = ref(false)
 
@@ -51,21 +56,42 @@ const onPage = async (event: any) => {
   rows.value = limit
   
   try {
-    await gameStore.fetchAll(page, limit)
+    await gameStore.fetchAll(page, limit, false)
     console.log(`🔍 GameList: Successfully loaded page ${page}`)
-    
-    // Debug: Check first game's team data structure
-    if (gameStore.games.length > 0) {
-      const firstGame = gameStore.games[0]
-      console.log('🔍 GameList: First game team data:', {
-        homeTeam: firstGame.homeTeam,
-        awayTeam: firstGame.awayTeam,
-        homeTeamId: firstGame.homeTeamId,
-        awayTeamId: firstGame.awayTeamId
-      })
-    }
   } catch (error) {
     console.error(`❌ GameList: Failed to load page ${page}:`, error)
+  }
+}
+
+// ✅ Handle sorting events
+const onSort = async (event: any) => {
+  console.log('🔍 GameList: Sort event:', event)
+  
+  sortField.value = event.sortField
+  sortOrder.value = event.sortOrder
+  
+  // Reset to first page when sorting
+  first.value = 0
+  const page = 1
+  
+  try {
+    await gameStore.fetchAll(page, rows.value, false)
+    console.log(`🔍 GameList: Successfully sorted by ${sortField.value}`)
+  } catch (error) {
+    console.error(`❌ GameList: Failed to sort:`, error)
+  }
+}
+
+// ✅ Build sort parameters for API
+const buildSortParams = () => {
+  if (!sortField.value || sortOrder.value === 0) {
+    return undefined
+  }
+  
+  const direction = sortOrder.value === 1 ? 'asc' : 'desc'
+  return {
+    sortBy: sortField.value,
+    sortOrder: direction
   }
 }
 
@@ -78,7 +104,7 @@ const editGame = (id: number) => {
 }
 
 const createGame = () => {
-  router.push('/games/new?mode=create')
+   showCreateModal.value = true
 }
 
 const deleteGame = async (id: number) => {
@@ -127,6 +153,7 @@ const formatMatchup = (game: any) => {
 
 // ✅ Handle successful game creation
 const onGameCreated = (newGame: any) => {
+
   showCreateModal.value = false
   
   // Optional: Refresh games list
@@ -207,8 +234,11 @@ const onGameCreated = (newGame: any) => {
       :totalRecords="gameStore.pagination?.total || 0"
       :rowsPerPageOptions="[5, 10, 20, 50]"
       @page="onPage"
+      @sort="onSort"
+      :sortField="sortField"
+      :sortOrder="sortOrder"
       responsiveLayout="scroll"
-      sortMode="multiple"
+      sortMode="single"
       :globalFilterFields="['seasonYear', 'homeTeam.name', 'awayTeam.name', 'gameLocation']"
     >
       <!-- Season Year -->
@@ -304,7 +334,7 @@ const onGameCreated = (newGame: any) => {
     >
       <GameCreateForm 
         @game-created="onGameCreated"
-        @cancel="showCreateModal = false"
+        @cancel="alert('BTN CLICKED!')"
       />
     </Dialog>
   </div>

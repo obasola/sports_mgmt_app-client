@@ -153,6 +153,7 @@ export const useGameStore = defineStore('game', () => {
     loading.value = true
     error.value = null
     try {
+      console.log("Calling clientside - gameService.create")
       const newGame = await gameService.create(data)
       games.value.push(newGame)
       currentGame.value = newGame
