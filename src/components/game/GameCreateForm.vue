@@ -225,11 +225,12 @@
 import { ref, reactive, computed, watch } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import { useTeamStore } from '@/stores/teamStore'
+import { useToast } from 'primevue/usetoast';
 
 // Stores
 const gameStore = useGameStore()
 const teamStore = useTeamStore()
-
+const toast = useToast()
 // Form data
 const formData = reactive({
   seasonYear: '',
@@ -385,7 +386,12 @@ const handleSubmit = async () => {
 
     // Submit to store
     await gameStore.create(gamePayload)
-    
+    toast.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: 'Game created successfully',
+      life: 4000
+    })
     // Reset form or navigate away
     handleCancel()
     
