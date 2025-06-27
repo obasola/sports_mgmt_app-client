@@ -10,7 +10,7 @@ import DraftPickDetail from '@/views/DraftPickDetail.vue'
 import ProspectDetail from '@/views/ProspectDetail.vue'
 import GameDetail from '@/views/GameDetail.vue'
 
-import ScheduleDetail from '@/views/scheduleDetail.vue'
+import ScheduleDetail from '@/views/GameScheduleView.vue'
 /*
 import TeamNeedDetail from '@/views/TeamNeedDetail.vue'
 import PostSeasonResultDetail from '@/views/PostSeasonResultDetail.vue'
@@ -58,11 +58,14 @@ const router = createRouter({
       name: 'ProspectDetail',
       component: ProspectDetail,
     },
-
     {
-      path: '/schedules/:id?',
-      name: 'ScheduleDetail',
+      path: '/schedules',
+      name: 'schedules',
       component: ScheduleDetail,
+      meta: {
+        title: 'NFL Schedule',
+        description: 'View and edit NFL game schedules',
+      },
     },
     {
       path: '/player-awards/:id?',

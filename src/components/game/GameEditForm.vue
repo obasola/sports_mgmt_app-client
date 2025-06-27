@@ -295,7 +295,7 @@ const gameWeeks = computed(() => {
   return weeks
 })
 
-// NFL Teams with placeholder IDs
+// NFL Teams with IDs
 const nflTeams = ref([
   { id: '61', name: 'Arizona Cardinals' },
   { id: '62', name: 'Atlanta Falcons' },
