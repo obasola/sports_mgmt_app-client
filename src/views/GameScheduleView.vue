@@ -1,10 +1,9 @@
-
 <template>
   <AppLayout>
     <div class="game-detail-view">
- 
+
       <!-- Show read-only view -->
-      <Schedule />
+      <Schedule :defaultSeason="'2025'" :defaultTeam="'league'" />
     </div>
   </AppLayout>
 </template>
@@ -72,15 +71,13 @@ import AppLayout from '@/components/ui/AppLayout.vue'
   .view-header {
     padding: 1rem;
   }
-  
+
   .view-header h1 {
     font-size: 1.5rem;
   }
-  
+
   .view-content {
     padding: 0;
   }
 }
 </style>
-
-

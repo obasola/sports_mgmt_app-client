@@ -1,8 +1,9 @@
 <template>
   <div class="pgHeader">
+    <h1>NFL Season Schedule</h1>
     <div class="team">
       <img v-if="selectedTeamObject" :src="getTeamShortNameAndLogo(selectedTeamObject).logoPath"
-        :alt="getTeamShortNameAndLogo(selectedTeamObject).shortName" class="team-logo" />
+        :alt="getTeamShortNameAndLogo(selectedTeamObject).fullName" class="team-logo" />
       <span v-if="selectedTeamObject">{{ getTeamShortNameAndLogo(selectedTeamObject).fullName }}</span>
       <span v-else-if="selectedTeam === 'league'">NFL League</span>
       <span v-else>Select Team</span>
@@ -193,13 +194,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
+import { useTeamStore } from '@/stores/teamStore'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import { useToast } from 'primevue/usetoast';
+import { Team } from '@/types'
 
 const gameStore = useGameStore()
+const teamStore = useTeamStore()
 const toast = useToast()
 // Reactive data
 const selectedSeason = ref('')
@@ -228,14 +232,21 @@ const gameStatusOptions = [
   { value: 'POSTPONED', label: 'Postponed' },
   { value: 'CANCELLED', label: 'Cancelled' }
 ]
-const selectedTeamObject = computed(() => {
+const selectedTeamObject = ref<any>(null)
+
+// Watch for selectedTeam changes to handle async team data loading
+watch([selectedTeam, () => gameStore.games], async () => {
   if (!selectedTeam.value || selectedTeam.value === 'league') {
-    return null
+    selectedTeamObject.value = null
+    return
   }
 
   // Find the team in nflTeams array
   const team = nflTeams.value.find(t => t.id === selectedTeam.value)
-  if (!team) return null
+  if (!team) {
+    selectedTeamObject.value = null
+    return
+  }
 
   // Get conference from loaded games data
   const gameWithTeam = gameStore.games.find(game =>
@@ -250,10 +261,20 @@ const selectedTeamObject = computed(() => {
     } else {
       conference = gameWithTeam.awayTeam?.conference || 'unknown'
     }
+  } else {
+    // Only fetch if conference is still unknown
+    try {
+      const teamData: Team | null = await teamStore.fetchById(Number(selectedTeam.value))
+      if (teamData?.conference) {
+        conference = teamData.conference
+      }
+    } catch (error) {
+      console.error('Error fetching team:', error)
+    }
   }
 
-  return { ...team, conference: conference }
-})
+  selectedTeamObject.value = { ...team, conference: conference }
+}, { immediate: true })
 
 
 const getTeamShortNameAndLogo = (team: any): { fullName: string; logoPath: string } => {
@@ -327,11 +348,24 @@ const scheduleGames = computed(() => {
 
   // Filter by team if not "league" (league shows all games)
   if (selectedTeam.value !== 'league') {
-    const teamId = selectedTeam.value.replace(/#/g, '')
-    games = games.filter(game =>
-      game.homeTeamId.toString() === teamId ||
-      game.awayTeamId.toString() === teamId
-    )
+    const teamId = selectedTeam.value // No need to replace # symbols anymore
+    
+    // Debug: Log what we're looking for and what we have
+    console.log(`Looking for games with teamId: "${teamId}" (type: ${typeof teamId})`)
+    console.log('Sample game homeTeamId:', games[0]?.homeTeamId, '(type:', typeof games[0]?.homeTeamId, ')')
+    console.log('Sample game awayTeamId:', games[0]?.awayTeamId, '(type:', typeof games[0]?.awayTeamId, ')')
+    
+    games = games.filter(game => {
+      const homeMatch = game.homeTeamId.toString() === teamId
+      const awayMatch = game.awayTeamId.toString() === teamId
+      const isMatch = homeMatch || awayMatch
+      
+      if (isMatch) {
+        console.log(`Found match: Game ${game.id} - Home: ${game.homeTeamId}, Away: ${game.awayTeamId}`)
+      }
+      
+      return isMatch
+    })
     console.log(`Games filtered for team ${teamId}:`, games.length)
   } else {
     console.log('League selected - showing all games for season:', games.length)

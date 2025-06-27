@@ -57,7 +57,8 @@ export const useTeamStore = defineStore('team', () => {
     }
   }
 
-  const fetchById = async (id: number, useCache = true) => {
+  // ✅ Fixed fetchById function
+  const fetchById = async (id: number, useCache = true): Promise<Team | null> => {
     if (useCache) {
       const cached = getTeamById.value(id)
       if (cached) {
