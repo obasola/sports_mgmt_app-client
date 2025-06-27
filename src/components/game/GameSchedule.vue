@@ -1,20 +1,15 @@
 <template>
-  <div class="schedule-view">
-    <div class="view-header">
-      <h1>NFL Schedule</h1>
-      <div class="breadcrumb">
-        <router-link to="/" class="breadcrumb-link">Home</router-link>
-        <span class="breadcrumb-separator">/</span>
-        <span class="breadcrumb-current">Schedule</span>
-      </div>
-    </div>
-  </div>
   <div class="schedule-container">
     <!-- Row 1: Season and Schedule Controls -->
     <div class="schedule-controls">
       <div class="control-group">
         <label for="season">Season:</label>
-        <select id="season" v-model="selectedSeason" class="schedule-select" @change="loadSchedule">
+        <select 
+          id="season" 
+          v-model="selectedSeason" 
+          class="schedule-select"
+          @change="loadSchedule"
+        >
           <option value="">Select Season</option>
           <option v-for="year in seasonYears" :key="year" :value="year">
             {{ year }}
@@ -24,7 +19,12 @@
 
       <div class="control-group">
         <label for="schedule">Schedule:</label>
-        <select id="schedule" v-model="selectedTeam" class="schedule-select" @change="loadSchedule">
+        <select 
+          id="schedule" 
+          v-model="selectedTeam" 
+          class="schedule-select"
+          @change="loadSchedule"
+        >
           <option value="">Select Team</option>
           <option value="league">League</option>
           <option v-for="team in nflTeams" :key="team.id" :value="team.id">
@@ -37,7 +37,7 @@
     <!-- Info text -->
     <div class="info-text">
       <span class="schedule-info">
-        Select season and team to view schedule. Use Edit/Save buttons to update scores.
+        Select season and team to view schedule. Use Edit/Save buttons to update scores and game status.
       </span>
     </div>
 
@@ -52,8 +52,16 @@
 
     <!-- Schedule Data Table -->
     <div v-if="!loading && !error && scheduleGames.length > 0" class="schedule-table-container">
-      <DataTable :value="scheduleGames" responsiveLayout="scroll" sortMode="single" :sortField="'gameWeek'"
-        :sortOrder="1" showGridlines stripedRows class="schedule-table">
+      <DataTable 
+        :value="scheduleGames" 
+        responsiveLayout="scroll"
+        sortMode="single"
+        :sortField="'gameWeek'"
+        :sortOrder="1"
+        showGridlines
+        stripedRows
+        class="schedule-table"
+      >
         <!-- Week Column -->
         <Column field="gameWeek" header="Week" sortable>
           <template #body="{ data }">
@@ -82,20 +90,28 @@
                 <span class="checkmark-placeholder">
                   <i v-if="isWinner(data, 'away')" class="pi pi-check winner-check"></i>
                 </span>
-                <img v-if="data.awayTeam" :src="getTeamLogo(data.awayTeam)" :alt="data.awayTeam.name"
-                  class="team-icon" />
+                <img 
+                  v-if="data.awayTeam" 
+                  :src="getTeamLogo(data.awayTeam)" 
+                  :alt="data.awayTeam.name"
+                  class="team-icon"
+                />
                 <span class="team-name">{{ getTeamShortName(data.awayTeam) }}</span>
               </div>
-
+              
               <span class="at-symbol">@</span>
-
+              
               <!-- Home Team -->
               <div class="team-display">
                 <span class="checkmark-placeholder">
                   <i v-if="isWinner(data, 'home')" class="pi pi-check winner-check"></i>
                 </span>
-                <img v-if="data.homeTeam" :src="getTeamLogo(data.homeTeam)" :alt="data.homeTeam.name"
-                  class="team-icon" />
+                <img 
+                  v-if="data.homeTeam" 
+                  :src="getTeamLogo(data.homeTeam)" 
+                  :alt="data.homeTeam.name"
+                  class="team-icon"
+                />
                 <span class="team-name">{{ getTeamShortName(data.homeTeam) }}</span>
               </div>
             </div>
@@ -117,11 +133,30 @@
         </Column>
 
         <!-- Status Column -->
-        <Column field="gameStatus" header="Status">
+        <Column field="gameStatus" header="Status" class="status-column">
           <template #body="{ data }">
-            <span class="status-badge" :class="getStatusClass(data.gameStatus)">
-              {{ data.gameStatus || 'SCHEDULED' }}
-            </span>
+            <div class="status-cell">
+              <span 
+                v-if="!isRowEditing(data.id)"
+                class="status-badge" 
+                :class="getStatusClass(data.gameStatus)"
+              >
+                {{ data.gameStatus || 'SCHEDULED' }}
+              </span>
+              <select 
+                v-else
+                v-model="data.gameStatus"
+                class="status-select"
+              >
+                <option 
+                  v-for="status in gameStatusOptions" 
+                  :key="status.value" 
+                  :value="status.value"
+                >
+                  {{ status.label }}
+                </option>
+              </select>
+            </div>
           </template>
         </Column>
 
@@ -129,10 +164,20 @@
         <Column header="Home Score" class="score-column">
           <template #body="{ data }">
             <div class="score-cell">
-              <span v-if="!isRowEditing(data.id)" class="score-display">
+              <span 
+                v-if="!isRowEditing(data.id)"
+                class="score-display"
+              >
                 {{ data.homeScore !== null ? data.homeScore : '-' }}
               </span>
-              <input v-else type="number" v-model="data.homeScore" class="score-input" min="0" placeholder="0" />
+              <input 
+                v-else
+                type="number" 
+                v-model="data.homeScore"
+                class="score-input"
+                min="0"
+                placeholder="0"
+              />
             </div>
           </template>
         </Column>
@@ -141,10 +186,20 @@
         <Column header="Visitor Score" class="score-column">
           <template #body="{ data }">
             <div class="score-cell">
-              <span v-if="!isRowEditing(data.id)" class="score-display">
+              <span 
+                v-if="!isRowEditing(data.id)"
+                class="score-display"
+              >
                 {{ data.awayScore !== null ? data.awayScore : '-' }}
               </span>
-              <input v-else type="number" v-model="data.awayScore" class="score-input" min="0" placeholder="0" />
+              <input 
+                v-else
+                type="number" 
+                v-model="data.awayScore"
+                class="score-input"
+                min="0"
+                placeholder="0"
+              />
             </div>
           </template>
         </Column>
@@ -153,20 +208,32 @@
         <Column header="Actions" class="actions-column">
           <template #body="{ data }">
             <div class="action-buttons">
-              <button v-if="!isRowEditing(data.id)" @click="startEdit(data)" class="edit-btn-row"
-                :disabled="isRowSaving(data.id)">
+              <button
+                v-if="!isRowEditing(data.id)"
+                @click="startEdit(data)"
+                class="edit-btn-row"
+                :disabled="isRowSaving(data.id)"
+              >
                 <i class="pi pi-pencil"></i>
                 Edit
               </button>
-
-              <button v-if="isRowEditing(data.id)" @click="saveScore(data)" class="save-btn-row"
-                :disabled="isRowSaving(data.id)">
+              
+              <button
+                v-if="isRowEditing(data.id)"
+                @click="saveScore(data)"
+                class="save-btn-row"
+                :disabled="isRowSaving(data.id)"
+              >
                 <i class="pi pi-check"></i>
                 {{ isRowSaving(data.id) ? 'Saving...' : 'Save' }}
               </button>
-
-              <button v-if="isRowEditing(data.id)" @click="cancelEdit(data)" class="cancel-btn-row"
-                :disabled="isRowSaving(data.id)">
+              
+              <button
+                v-if="isRowEditing(data.id)"
+                @click="cancelEdit(data)"
+                class="cancel-btn-row"
+                :disabled="isRowSaving(data.id)"
+              >
                 <i class="pi pi-times"></i>
                 Cancel
               </button>
@@ -177,8 +244,7 @@
     </div>
 
     <!-- No Data Message -->
-    <div v-if="!loading && !error && scheduleGames.length === 0 && selectedSeason && selectedTeam"
-      class="message-container">
+    <div v-if="!loading && !error && scheduleGames.length === 0 && selectedSeason && selectedTeam" class="message-container">
       <div class="no-data-message">
         No games found for the selected season and team.
       </div>
@@ -191,9 +257,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useGameStore } from '@/stores/gameStore'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import { useToast } from 'primevue/usetoast';
 
 const gameStore = useGameStore()
-
+const toast = useToast()
 // Reactive data
 const selectedSeason = ref('')
 const selectedTeam = ref('')
@@ -212,7 +279,17 @@ const seasonYears = computed(() => {
   return years
 })
 
-// NFL Teams with IDs
+// Game status options for editing
+const gameStatusOptions = [
+  { value: 'SCHEDULED', label: 'Scheduled' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'FINAL', label: 'Final' },
+  { value: 'POSTPONED', label: 'Postponed' },
+  { value: 'CANCELLED', label: 'Cancelled' }
+]
+
+// NFL Teams
 const nflTeams = ref([
   { id: '61', name: 'Arizona Cardinals' },
   { id: '62', name: 'Atlanta Falcons' },
@@ -250,21 +327,32 @@ const nflTeams = ref([
 
 // Computed schedule games
 const scheduleGames = computed(() => {
-  if (!selectedSeason.value || !selectedTeam.value) return []
-
-  let games = gameStore.games.filter(game =>
+  // Must have both season and team/league selected
+  if (!selectedSeason.value || !selectedTeam.value) {
+    console.log('Missing selection:', { season: selectedSeason.value, team: selectedTeam.value })
+    return []
+  }
+  
+  // Start with all games for the selected season
+  let games = gameStore.games.filter(game => 
     game.seasonYear === selectedSeason.value
   )
-
-  // Filter by team if not "league"
+  
+  console.log(`Games for season ${selectedSeason.value}:`, games.length)
+  
+  // Filter by team if not "league" (league shows all games)
   if (selectedTeam.value !== 'league') {
     const teamId = selectedTeam.value.replace(/#/g, '')
-    games = games.filter(game =>
-      game.homeTeamId.toString() === teamId ||
+    games = games.filter(game => 
+      game.homeTeamId.toString() === teamId || 
       game.awayTeamId.toString() === teamId
     )
+    console.log(`Games filtered for team ${teamId}:`, games.length)
+  } else {
+    console.log('League selected - showing all games for season:', games.length)
   }
-
+  
+  // Sort by week, then by date
   return games.sort((a, b) => {
     // Sort by week, then by date
     if (a.gameWeek !== b.gameWeek) {
@@ -280,10 +368,10 @@ const scheduleGames = computed(() => {
 // Methods
 const loadSchedule = async () => {
   if (!selectedSeason.value || !selectedTeam.value) return
-
+  
   loading.value = true
   error.value = ''
-
+  
   try {
     // Load all games for the selected season
     await gameStore.fetchAll(1, 1000, true)
@@ -297,50 +385,72 @@ const loadSchedule = async () => {
 
 const startEdit = (game: any) => {
   const gameId = game.id
-  // Store original scores before editing
+  // Store original scores AND status before editing
   originalScores.value.set(gameId, {
     homeScore: game.homeScore,
-    awayScore: game.awayScore
+    awayScore: game.awayScore,
+    gameStatus: game.gameStatus
   })
   editingRows.value.add(gameId)
 }
 
 const cancelEdit = (game: any) => {
   const gameId = game.id
-  // Restore original scores
+  // Restore original scores AND status
   const original = originalScores.value.get(gameId)
   if (original) {
     game.homeScore = original.homeScore
     game.awayScore = original.awayScore
+    game.gameStatus = original.gameStatus
   }
-
+  
   editingRows.value.delete(gameId)
   originalScores.value.delete(gameId)
 }
 
 const saveScore = async (game: any) => {
   const gameId = game.id
-
+  
   try {
     savingRows.value.add(gameId)
-
+    
     // Create update payload
     const updateData = {
       homeScore: game.homeScore !== null ? Number(game.homeScore) : null,
       awayScore: game.awayScore !== null ? Number(game.awayScore) : null,
-      gameStatus: game.gameStatus || 'completed'
+      //gameStatus: game.gameStatus || 'completed'
+      gameStatus: game.gameStatus ? game.gameStatus.toLowerCase() : 'scheduled'
     }
-
+    
     await gameStore.update(gameId, updateData)
     console.log(`Updated scores for game ${gameId}`)
-
+    
     // On success: exit edit mode and cleanup
     editingRows.value.delete(gameId)
     originalScores.value.delete(gameId)
-
-  } catch (err) {
-    console.error('Failed to save score:', err)
-    error.value = 'Failed to save score changes'
+    
+  }  catch (err: any) {
+    console.error('Failed to save game:', err)
+    
+    // Extract error message from API response
+    let errorMessage = 'Failed to save game changes'
+    
+    if (err?.response?.data?.message) {
+      errorMessage = err.response.data.message
+    } else if (err?.response?.data?.error) {
+      errorMessage = err.response.data.error
+    } else if (err?.message) {
+      errorMessage = err.message
+    }
+    
+    error.value = errorMessage
+    console.log('Displaying error to user:', errorMessage)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: errorMessage,
+      life: 4000
+    })
   } finally {
     savingRows.value.delete(gameId)
   }
@@ -365,15 +475,15 @@ const formatGameDate = (date: string | Date) => {
 
 const formatLocation = (game: any) => {
   const parts = []
-
+  
   if (game.gameCity) parts.push(game.gameCity)
   if (game.gameStateProvince) parts.push(game.gameStateProvince)
-
+  
   // Only show country if not USA
   if (game.gameCountry && game.gameCountry.toUpperCase() !== 'USA') {
     parts.push(game.gameCountry)
   }
-
+  
   return parts.length > 0 ? parts.join(', ') : 'TBD'
 }
 
@@ -385,11 +495,11 @@ const getTeamShortName = (team: any) => {
 
 const getTeamLogo = (team: any) => {
   if (!team || !team.name || !team.conference) return ''
-
+  
   const shortName = getTeamShortName(team)
   const fileExt = shortName === 'Chargers' ? 'webp' : 'avif'
   const logoFile = `${shortName}.${fileExt}`
-
+  
   try {
     return new URL(`../../assets/images/${team.conference.toLowerCase()}/${logoFile}`, import.meta.url).href
   } catch {
@@ -400,7 +510,7 @@ const getTeamLogo = (team: any) => {
 const isWinner = (game: any, side: 'home' | 'away') => {
   if (game.homeScore === null || game.awayScore === null) return false
   if (game.homeScore === game.awayScore) return false // Tie
-
+  
   if (side === 'home') {
     return game.homeScore > game.awayScore
   } else {
@@ -410,7 +520,7 @@ const isWinner = (game: any, side: 'home' | 'away') => {
 
 const getStatusClass = (status: string) => {
   const statusLower = status?.toLowerCase() || 'scheduled'
-
+  
   switch (statusLower) {
     case 'completed':
     case 'final':
@@ -551,6 +661,25 @@ onMounted(() => {
   color: #6c757d;
 }
 
+.status-cell {
+  min-width: 100px;
+}
+
+.status-select {
+  width: 100%;
+  padding: 0.25rem;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background: white;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
 .status-badge {
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
@@ -627,6 +756,11 @@ onMounted(() => {
 
 :deep(.score-column) {
   width: 100px;
+  text-align: center;
+}
+
+:deep(.status-column) {
+  width: 120px;
   text-align: center;
 }
 
