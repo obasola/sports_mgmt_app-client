@@ -8,26 +8,32 @@ import Column from 'primevue/column'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
 import Dialog from 'primevue/dialog'
+import { FilterMatchMode } from 'primevue/api'
 import GameCreateForm from '@/components/game/GameCreateForm.vue'
 import GameEditForm from '@/components/game/GameEditForm.vue'
 
 const gameStore = useGameStore()
 const router = useRouter()
 
-// Pagination refs
+// Pagination refs (now client-side)
 const rows = ref(10)
 const first = ref(0)
-// ✅ Sorting refs
-const sortField = ref('')
-const sortOrder = ref(0) // 0 = none, 1 = asc, -1 = desc
 // ✅ Modal visibility control
 const showCreateModal = ref(false)
 
+// ✅ Filters for client-side filtering
+const filters = ref({
+  'seasonYear': { value: null, matchMode: FilterMatchMode.CONTAINS },
+  'homeTeam.name': { value: null, matchMode: FilterMatchMode.CONTAINS },
+  'gameLocation': { value: null, matchMode: FilterMatchMode.CONTAINS }
+})
+
 onMounted(async () => {
-  console.log('🔍 GameList: Component mounted, fetching initial data')
+  console.log('🔍 GameList: Component mounted, fetching all data for client-side operations')
   try {
-    await gameStore.fetchAll(1, rows.value)
-    console.log('🔍 GameList: Initial data fetch successful')
+    // Load ALL games for client-side sorting/filtering/pagination
+    await gameStore.fetchAll(1, 1000, true) // Fetch a large number or modify store to fetch all
+    console.log('🔍 GameList: All data fetch successful')
 
     // Debug: Check first game's team data structure
     if (gameStore.games.length > 0) {
@@ -45,54 +51,12 @@ onMounted(async () => {
   }
 })
 
-// Handle pagination events
-const onPage = async (event: any) => {
-  const page = event.page + 1 // PrimeVue uses 0-based, backend uses 1-based
-  const limit = event.rows
-
-  console.log(`🔍 GameList: Page change event - page: ${page}, limit: ${limit}`)
-
+// Handle pagination events (client-side only, no server calls)
+const onPage = (event: any) => {
+  console.log(`🔍 GameList: Client-side page change - page: ${event.page + 1}, rows: ${event.rows}`)
   first.value = event.first
-  rows.value = limit
-
-  try {
-    await gameStore.fetchAll(page, limit, false)
-    console.log(`🔍 GameList: Successfully loaded page ${page}`)
-  } catch (error) {
-    console.error(`❌ GameList: Failed to load page ${page}:`, error)
-  }
-}
-
-// ✅ Handle sorting events
-const onSort = async (event: any) => {
-  console.log('🔍 GameList: Sort event:', event)
-
-  sortField.value = event.sortField
-  sortOrder.value = event.sortOrder
-
-  // Reset to first page when sorting
-  first.value = 0
-  const page = 1
-
-  try {
-    await gameStore.fetchAll(page, rows.value, false)
-    console.log(`🔍 GameList: Successfully sorted by ${sortField.value}`)
-  } catch (error) {
-    console.error(`❌ GameList: Failed to sort:`, error)
-  }
-}
-
-// ✅ Build sort parameters for API
-const buildSortParams = () => {
-  if (!sortField.value || sortOrder.value === 0) {
-    return undefined
-  }
-
-  const direction = sortOrder.value === 1 ? 'asc' : 'desc'
-  return {
-    sortBy: sortField.value,
-    sortOrder: direction
-  }
+  rows.value = event.rows
+  // No server call needed - PrimeVue handles client-side pagination automatically
 }
 
 const viewGame = (id: number) => {
@@ -111,8 +75,8 @@ const deleteGame = async (id: number) => {
   if (confirm('Are you sure you want to delete this game?')) {
     try {
       await gameStore.remove(id)
-      // Refresh current page after delete
-      await gameStore.fetchAll(gameStore.currentPage, gameStore.itemsPerPage, true)
+      // After delete, refresh all data for client-side operations
+      await gameStore.fetchAll(1, 1000, true)
       console.log(`✅ GameList: Successfully deleted game ${id}`)
     } catch (error) {
       console.error(`❌ GameList: Failed to delete game ${id}:`, error)
@@ -124,7 +88,7 @@ const retryFetch = async () => {
   console.log('🔄 GameList: Retrying data fetch')
   gameStore.clearError()
   try {
-    await gameStore.fetchAll(1, rows.value, true)
+    await gameStore.fetchAll(1, 1000, true)
   } catch (error) {
     console.error('❌ GameList: Retry failed:', error)
   }
@@ -153,11 +117,10 @@ const formatMatchup = (game: any) => {
 
 // ✅ Handle successful game creation
 const onGameCreated = (newGame: any) => {
-
   showCreateModal.value = false
 
-  // Optional: Refresh games list
-  gameStore.fetchAll()
+  // Refresh all games list for client-side operations
+  gameStore.fetchAll(1, 1000, true)
 
   // Optional: Navigate to the new game
   // router.push(`/games/${newGame.id}`)
@@ -202,9 +165,9 @@ const cancelRequest = () => {
 
     <!-- Debug Info (remove in production) -->
     <Message v-if="gameStore.games.length === 0 && !gameStore.loading && !gameStore.error" severity="info" class="mb-3">
-      No games found. Total records: {{ gameStore.pagination?.total || 0 }}
+      No games found. Total records: {{ gameStore.games.length }}
       <br>
-      <small>API endpoint: <code>/games?page=1&limit=10</code></small>
+      <small>Client-side sorting enabled - all data loaded</small>
     </Message>
 
     <!-- Team Data Debug (remove in production) -->
@@ -221,15 +184,32 @@ const cancelRequest = () => {
       </small>
     </Message>
 
-    <DataTable :value="gameStore.games" :loading="gameStore.loading" :lazy="true" paginator :rows="rows" :first="first"
-      :totalRecords="gameStore.pagination?.total || 0" :rowsPerPageOptions="[5, 10, 20, 50]" @page="onPage"
-      @sort="onSort" :sortField="sortField" :sortOrder="sortOrder" responsiveLayout="scroll" sortMode="single"
-      :globalFilterFields="['seasonYear', 'homeTeam.name', 'awayTeam.name', 'gameLocation']">
+    <!-- ✅ Client-side DataTable with automatic sorting -->
+    <DataTable 
+      :value="gameStore.games" 
+      :loading="gameStore.loading" 
+      paginator 
+      :rows="rows" 
+      :first="first"
+      :rowsPerPageOptions="[5, 10, 20, 50, 100]" 
+      @page="onPage"
+      responsiveLayout="scroll" 
+      sortMode="single"
+      :globalFilterFields="['seasonYear', 'homeTeam.name', 'awayTeam.name', 'gameLocation']"
+      filterDisplay="menu"
+      :filters="filters"
+      showGridlines
+      stripedRows>
+      
       <!-- Season Year -->
-      <Column field="seasonYear" header="Season" sortable />
+      <Column field="seasonYear" header="Season" sortable :showFilterMatchModes="false">
+        <template #filter="{ filterModel }">
+          <input v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Search by season" />
+        </template>
+      </Column>
 
       <!-- Week -->
-      <Column header="Week" sortable>
+      <Column header="Week" sortable sortField="gameWeek">
         <template #body="{ data }">
           <span v-if="data.preseason">Pre {{ data.preseason }}</span>
           <span v-else-if="data.gameWeek">Week {{ data.gameWeek }}</span>
@@ -238,7 +218,7 @@ const cancelRequest = () => {
       </Column>
 
       <!-- Date -->
-      <Column field="gameDate" header="Date" sortable>
+      <Column field="gameDate" header="Date" sortable dataType="date">
         <template #body="{ data }">
           <span v-if="data.gameDate">
             {{ new Date(data.gameDate).toLocaleDateString() }}
@@ -248,7 +228,7 @@ const cancelRequest = () => {
       </Column>
 
       <!-- Matchup -->
-      <Column header="Matchup">
+      <Column header="Matchup" sortField="homeTeam.name">
         <template #body="{ data }">
           <div class="matchup-cell">
             <div class="team">
@@ -264,11 +244,13 @@ const cancelRequest = () => {
             </div>
           </div>
         </template>
+        <template #filter="{ filterModel }">
+          <input v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Search teams" />
+        </template>
       </Column>
 
-
       <!-- Score -->
-      <Column header="Score">
+      <Column header="Score" sortField="homeScore">
         <template #body="{ data }">
           <span v-if="data.homeScore !== null && data.awayScore !== null">
             {{ data.awayScore }} - {{ data.homeScore }}
@@ -278,14 +260,16 @@ const cancelRequest = () => {
       </Column>
 
       <!-- Location -->
-      <Column field="gameLocation" header="Location">
+      <Column field="gameLocation" header="Location" sortable>
         <template #body="{ data }">
           <span v-if="data.gameLocation">{{ data.gameLocation }}</span>
-          <span v-else-if="data.gameCity && data.gameStateProvince">{{ data.gameCity }}, {{ data.gameStateProvince
-            }}</span>
+          <span v-else-if="data.gameCity && data.gameStateProvince">{{ data.gameCity }}, {{ data.gameStateProvince }}</span>
           <span v-else-if="data.gameCity">{{ data.gameCity }}</span>
           <span v-else-if="data.homeTeam && data.homeTeam.city">{{ data.homeTeam.city }}</span>
           <span v-else class="text-muted">TBD</span>
+        </template>
+        <template #filter="{ filterModel }">
+          <input v-model="filterModel.value" type="text" class="p-column-filter" placeholder="Search location" />
         </template>
       </Column>
 
@@ -309,13 +293,13 @@ const cancelRequest = () => {
         </template>
       </Column>
     </DataTable>
+    
     <!-- ✅ Create Game Modal -->
     <Dialog v-model:visible="showCreateModal" modal header="Create New Game" :style="{ width: '50rem' }"
       :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
       <GameCreateForm @game-created="onGameCreated" @cancel="cancelRequest" />
     </Dialog>
   </div>
-
 </template>
 
 <style scoped>
@@ -343,6 +327,7 @@ const cancelRequest = () => {
 .mb-3 {
   margin-bottom: 1rem;
 }
+
 .matchup-cell {
   display: flex;
   align-items: center;
@@ -366,5 +351,4 @@ const cancelRequest = () => {
   font-weight: bold;
   margin: 0 0.25rem;
 }
-
 </style>
