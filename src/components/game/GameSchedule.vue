@@ -1,6 +1,9 @@
 <template>
   <div class="pgHeader">
-    <h1>NFL Season Schedule</h1>
+    <h1>
+      <img :src="getNflLogo()"  class="nfl-logo" />
+      Season Schedule
+    </h1>
     <div class="team">
       <img v-if="selectedTeamObject" :src="getTeamShortNameAndLogo(selectedTeamObject).logoPath"
         :alt="getTeamShortNameAndLogo(selectedTeamObject).fullName" class="team-logo" />
@@ -291,7 +294,9 @@ const getTeamShortNameAndLogo = (team: any): { fullName: string; logoPath: strin
   console.log("logoPath: " + logoPath)
   return { fullName, logoPath }
 }
-
+function getNflLogo() {
+  return new URL('../../assets/images/NFLogo.jpeg', import.meta.url).href
+}
 const cancelRequest = () => {
   alert('BTN CLICKED!')
 }
@@ -349,21 +354,21 @@ const scheduleGames = computed(() => {
   // Filter by team if not "league" (league shows all games)
   if (selectedTeam.value !== 'league') {
     const teamId = selectedTeam.value // No need to replace # symbols anymore
-    
+
     // Debug: Log what we're looking for and what we have
     console.log(`Looking for games with teamId: "${teamId}" (type: ${typeof teamId})`)
     console.log('Sample game homeTeamId:', games[0]?.homeTeamId, '(type:', typeof games[0]?.homeTeamId, ')')
     console.log('Sample game awayTeamId:', games[0]?.awayTeamId, '(type:', typeof games[0]?.awayTeamId, ')')
-    
+
     games = games.filter(game => {
       const homeMatch = game.homeTeamId.toString() === teamId
       const awayMatch = game.awayTeamId.toString() === teamId
       const isMatch = homeMatch || awayMatch
-      
+
       if (isMatch) {
         console.log(`Found match: Game ${game.id} - Home: ${game.homeTeamId}, Away: ${game.awayTeamId}`)
       }
-      
+
       return isMatch
     })
     console.log(`Games filtered for team ${teamId}:`, games.length)
@@ -576,13 +581,19 @@ onMounted(() => {
   gap: 0.25rem;
 }
 
+.nfl-logo {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  vertical-align: bottom;
+}
+
 .team-logo {
   width: 120px;
   height: 120px;
   object-fit: contain;
   vertical-align: middle;
 }
-
 .schedule-container {
   width: 100%;
 }
