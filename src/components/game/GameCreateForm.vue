@@ -233,7 +233,7 @@ const teamStore = useTeamStore()
 const toast = useToast()
 // Form data
 const formData = reactive({
-  seasonYear: '',
+  seasonYear: '2025',
   gameWeek: null as number | null,
   preseason: 0,
   gameDate: '',
@@ -307,9 +307,9 @@ const nflTeams = ref([
 const onHomeTeamChange = async () => {
   if (formData.homeTeamId) {
     try {
-      // Extract number from placeholder ID format (#1# -> 1)
-      const teamId = formData.homeTeamId.replace(/#/g, '')
-      const team = await teamStore.getTeamById(Number(teamId))
+      // Fix 1: Use fetchById instead of getTeamById
+      // Fix 2: Remove the .replace() since team IDs are already clean ('61', '62', etc.)
+      const team = await teamStore.fetchById(Number(formData.homeTeamId))
       if (team) {
         // Only populate if this is a USA game
         if (isUSAGame.value) {

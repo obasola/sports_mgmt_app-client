@@ -209,7 +209,7 @@ const gameStore = useGameStore()
 const teamStore = useTeamStore()
 const toast = useToast()
 // Reactive data
-const selectedSeason = ref('')
+const selectedSeason = ref('2025')
 const selectedTeam = ref('')
 const loading = ref(false)
 const error = ref('')
