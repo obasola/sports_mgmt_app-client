@@ -1,13 +1,11 @@
 <template>
   <AppLayout>
     <div class="team-selection-container">
-     
-
       <div class="content-grid">
         <!-- Team Selection Section -->
         <div class="teams-section">
           <div class="section-header">
-            <h2>Draft Selections for NFL Teams</h2>
+            <h2>Draft selection for NFL Teams</h2>
             <div class="selection-summary">
               <span class="selected-count">{{ selectedTeams.length }} teams selected</span>
               <button 
@@ -20,42 +18,41 @@
             </div>
           </div>
 
-          <!-- Conference Tabs -->
-          <div class="conference-tabs">
-            <button
-              v-for="conference in conferences"
+          <!-- PrimeVue Conference Tabs -->
+          <TabView v-model:activeIndex="activeTabIndex" class="conference-tabs">
+            <TabPanel 
+              v-for="(conference, index) in conferences" 
               :key="conference.abbreviation"
-              :class="['tab-button', { active: activeTab === conference.abbreviation }]"
-              @click="activeTab = conference.abbreviation"
             >
-              <div class="tab-logo">
-                <img 
-                  v-if="conference.logoUrl"
-                  :src="conference.logoUrl" 
-                  :alt="`${conference.abbreviation} logo`"
-                  class="tab-logo-img"
-                />
-                <div v-else class="tab-logo-fallback">{{ conference.abbreviation }}</div>
-              </div>
-              <div class="tab-info">
-                <span class="tab-name">{{ conference.abbreviation }}</span>
-                <span class="tab-count">{{ getSelectedInConference(conference.abbreviation) }}/{{ conference.teams.length }}</span>
-              </div>
-            </button>
-          </div>
+              <template #header>
+                <div class="tab-header">
+                  <div class="tab-logo">
+                    <img 
+                      v-if="conference.logoUrl"
+                      :src="conference.logoUrl" 
+                      :alt="`${conference.abbreviation} logo`"
+                      class="tab-logo-img"
+                    />
+                    <div v-else class="tab-logo-fallback">{{ conference.abbreviation }}</div>
+                  </div>
+                  <div class="tab-info">
+                    <span class="tab-name">{{ conference.abbreviation }}</span>
+                    <span class="tab-count">{{ getSelectedInConference(conference.abbreviation) }}/{{ conference.teams.length }}</span>
+                  </div>
+                </div>
+              </template>
 
-          <!-- Active Conference Content -->
-          <div class="conference-content">
-            <ConferenceSection
-              v-for="conference in conferences"
-              v-show="activeTab === conference.abbreviation"
-              :key="conference.abbreviation"
-              :conference="conference"
-              :selected-teams="selectedTeams"
-              :show-four-columns="true"
-              @toggle-team="toggleTeamSelection"
-            />
-          </div>
+              <!-- Conference Content -->
+              <div class="conference-content">
+                <ConferenceSection
+                  :conference="conference"
+                  :selected-teams="selectedTeams"
+                  :show-four-columns="true"
+                  @toggle-team="toggleTeamSelection"
+                />
+              </div>
+            </TabPanel>
+          </TabView>
         </div>
 
         <!-- Settings Section -->
@@ -76,16 +73,26 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
 import AppLayout from '@/components/ui/AppLayout.vue'
 import ConferenceSection from '@/components/draftselection/ConferenceSection.vue'
 import DraftSettings from '@/components/draftselection/DraftSettings.vue'
 import { useTeamData } from '@/composables/useTeamData'
+import type { Conference } from '@/types/Teams';
+
+interface Props {
+  conference: Conference
+}
+
+defineProps<Props>()
+
 const router = useRouter()
 
 // State
 const selectedTeams = ref<string[]>([])
 const currentRound = ref<number>(1)
-const activeTab = ref<'AFC' | 'NFC'>('AFC')
+const activeTabIndex = ref<number>(0)
 
 // Use team data composable
 const { conferences, getAllTeamCodes, getTeamsByConference } = useTeamData({ 
@@ -120,7 +127,10 @@ const selectConference = (conference: 'AFC' | 'NFC') => {
   const conferenceTeams = getTeamsByConference(conference)
   selectedTeams.value = conferenceTeams.map(team => team.code)
   // Switch to the selected conference tab
-  activeTab.value = conference
+  const conferenceIndex = conferences.value.findIndex(c => c.abbreviation === conference)
+  if (conferenceIndex !== -1) {
+    activeTabIndex.value = conferenceIndex
+  }
 }
 
 const submitTeamSelection = () => {
@@ -140,27 +150,9 @@ const submitTeamSelection = () => {
 
 <style scoped>
 .team-selection-container {
-  padding: 2rem;
+  padding: 0.3rem 2rem 2rem 2rem;
   max-width: 1400px;
   margin: 0 auto;
-}
-
-.page-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 0.5rem;
-}
-
-.page-subtitle {
-  font-size: 1.1rem;
-  color: #aaa;
-  margin: 0;
 }
 
 .content-grid {
@@ -210,44 +202,24 @@ const submitTeamSelection = () => {
   font-weight: 600;
 }
 
+/* PrimeVue Tab Customization */
 .conference-tabs {
-  display: flex;
-  gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
 
-.tab-button {
-  flex: 1;
+.tab-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 1rem;
-  background: #2a2a2a;
-  border: 2px solid #333;
-  border-radius: 8px;
-  color: #aaa;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-button:hover {
-  background: #333;
-  border-color: #444;
-}
-
-.tab-button.active {
-  background: #1a5d3a;
-  border-color: #28a745;
-  color: #fff;
-  box-shadow: 0 0 0 1px rgba(40, 167, 69, 0.3);
+  padding: 0.5rem;
 }
 
 .tab-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 80px;
-  height: 80px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   flex-shrink: 0;
   overflow: hidden;
@@ -263,7 +235,7 @@ const submitTeamSelection = () => {
 .tab-logo-fallback {
   color: white;
   font-weight: bold;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
 }
 
 .tab-info {
@@ -274,21 +246,59 @@ const submitTeamSelection = () => {
 }
 
 .tab-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
 }
 
 .tab-count {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   opacity: 0.8;
 }
 
 .conference-content {
   min-height: 400px;
+  padding-top: 1rem;
 }
 
 .settings-section {
   position: sticky;
   top: 2rem;
+}
+
+/* PrimeVue Tab Theme Overrides */
+:deep(.p-tabview .p-tabview-nav) {
+  background: transparent;
+  border: none;
+}
+
+:deep(.p-tabview .p-tabview-nav li .p-tabview-nav-link) {
+  background: #2a2a2a;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #aaa;
+  margin-right: 0.5rem;
+  padding: 1rem;
+}
+
+:deep(.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link) {
+  background: #1a5d3a;
+  border-color: #28a745;
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(40, 167, 69, 0.3);
+}
+
+:deep(.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus) {
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5);
+}
+
+:deep(.p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link) {
+  background: #333;
+  border-color: #444;
+}
+
+:deep(.p-tabview .p-tabview-panels) {
+  background: transparent;
+  padding: 0;
+  border: none;
 }
 </style>

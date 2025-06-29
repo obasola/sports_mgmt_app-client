@@ -35,11 +35,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Team, Conference } from '@/types/Teams'
+import type { Team } from '@/types/teams'
 
 interface Props {
   team: Team
-  conference: Conference
   selected: boolean
 }
 
@@ -71,6 +70,25 @@ const onImageError = (event: Event) => {
   min-height: 50px;
 }
 
+/* For horizontal 4-column layout within divisions */
+.teams-grid.four-columns .team-item {
+  flex: 1;
+  padding: 0.6rem;  /* Increased padding for more substantial feel */
+  gap: 0.5rem;      /* Increased gap between logo and text */
+  min-height: 50px; /* Increased height for better presence */
+  min-width: 0;
+  margin: 0;        /* Ensure no extra margins */
+  background: #4a4a4a; /* Slightly lighter background for better definition */
+}
+
+.teams-grid.four-columns .team-item:hover {
+  background: #505050; /* Lighter hover state */
+}
+
+.teams-grid.four-columns .team-item.selected {
+  background: #1e7e34; /* Slightly lighter selected state */
+}
+
 .team-item:hover {
   background: #4a4a4a;
   transform: translateY(-1px);
@@ -99,9 +117,15 @@ const onImageError = (event: Event) => {
   background: #555;
 }
 
+/* Larger logos for 4-column layouts to fill space better */
+.teams-grid.four-columns .team-logo {
+  width: 35px;  /* Increased from 30px */
+  height: 35px;
+}
+
 .team-logo-img {
-  width: 160px;
-  height: 160px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   background: white;
   border-radius: 4px;
@@ -118,18 +142,28 @@ const onImageError = (event: Event) => {
   font-weight: bold;
   font-size: 0.65rem;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  line-height: 1;  /* Tight line height for logo text */
 }
 
 .team-info {
   flex: 1;
   min-width: 0;
+  text-align: left;
+}
+
+/* For horizontal layout, optimize text display to use more space */
+.teams-grid.four-columns .team-info {
+  text-align: left;
+  min-width: 0;
+  flex: 2;           /* Give text area more space relative to logo */
+  padding-right: 0.25rem; /* Small padding to prevent text touching edge */
 }
 
 .team-name {
   color: #fff;
   font-size: 0.75rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.1;  /* Tighter line height */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -138,10 +172,38 @@ const onImageError = (event: Event) => {
 .team-city {
   color: #aaa;
   font-size: 0.65rem;
-  line-height: 1.1;
+  line-height: 1.0;  /* Very tight line height */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Larger text for 4-column horizontal layout - bigger fonts, same container size */
+.teams-grid.four-columns .team-name {
+  font-size: 0.9rem;   /* Increased from 0.8rem */
+  line-height: 1.1;    /* Tighter line height to prevent container growth */
+}
+
+.teams-grid.four-columns .team-city {
+  font-size: 0.8rem;   /* Increased from 0.7rem */
+  line-height: 1.0;    /* Very tight line height */
+}
+
+.teams-grid.four-columns .team-logo-fallback {
+  font-size: 0.75rem;  /* Increased from 0.65rem */
+}
+
+/* On very wide screens, we can afford even larger text */
+@media (min-width: 1400px) {
+  .teams-grid.four-columns .team-name {
+    font-size: 1.0rem;   /* Even bigger on wide screens */
+    line-height: 1.0;
+  }
+  
+  .teams-grid.four-columns .team-city {
+    font-size: 0.85rem;  /* Bigger city text too */
+    line-height: 1.0;
+  }
 }
 
 .selected-indicator {
@@ -154,7 +216,37 @@ const onImageError = (event: Event) => {
   height: 14px;
 }
 
-/* Compact mode for mobile */
+/* Smaller selected indicator in 4-column layout to save space */
+.teams-grid.four-columns .selected-indicator svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Compact mode for 4-column team layout */
+@media (min-width: 1200px) {
+  .four-columns .team-item {
+    padding: 0.4rem;
+    min-height: 45px;
+    gap: 0.3rem;
+  }
+  
+  .four-columns .team-logo {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .four-columns .team-name {
+    font-size: 0.7rem;
+  }
+  
+  .four-columns .team-city {
+    font-size: 0.6rem;
+  }
+  
+  .four-columns .team-logo-fallback {
+    font-size: 0.6rem;
+  }
+}
 @media (max-width: 600px) {
   .team-item {
     padding: 0.4rem;

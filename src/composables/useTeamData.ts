@@ -144,7 +144,7 @@ export function useTeamData(options: { enableLogos?: boolean } = {}) {
     return [
       {
         name: 'American Football Conference',
-        abbreviation: 'AFC',
+        abbreviation: 'AFC' as const,
         color: '#FF0000',
         logoUrl: enableLogos ? '/images/afc-logo.avif' : undefined,
         teams: afcTeams,
@@ -152,7 +152,7 @@ export function useTeamData(options: { enableLogos?: boolean } = {}) {
       },
       {
         name: 'National Football Conference',
-        abbreviation: 'NFC',
+        abbreviation: 'NFC' as const,
         color: '#0000FF',
         logoUrl: enableLogos ? '/images/nfc-logo.avif' : undefined,
         teams: nfcTeams,
