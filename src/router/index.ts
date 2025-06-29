@@ -11,6 +11,7 @@ import ProspectDetail from '@/views/ProspectDetail.vue'
 import GameDetail from '@/views/GameDetail.vue'
 
 import ScheduleDetail from '@/views/GameScheduleView.vue'
+import TeamSelectionView from '@/views/TeamSelectionView.vue'
 /*
 import TeamNeedDetail from '@/views/TeamNeedDetail.vue'
 import PostSeasonResultDetail from '@/views/PostSeasonResultDetail.vue'
@@ -52,6 +53,11 @@ const router = createRouter({
       path: '/draft-picks/:id?',
       name: 'DraftPickDetail',
       component: DraftPickDetail,
+    },
+    {
+      path: '/draft',
+      name: 'draft',
+      component: TeamSelectionView,
     },
     {
       path: '/prospects/:id?',

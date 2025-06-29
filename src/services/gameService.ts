@@ -329,11 +329,10 @@ export class GameService {
 
   async getPreseasonGames(
     teamId?: number,
-    seasonYear?: number,
-    preseasonWeek?: number
+    seasonYear?: number
   ): Promise<Game[]> {
     console.log(
-      `🔍 Game Service: Fetching games by season: ${seasonYear}` + ` and week:${preseasonWeek}`
+      `🔍 Game Service: Fetching games by season: ${seasonYear}` + ` and team:${teamId}`
     )
     try {
       const response = await apiService.get<ApiResponse<Game[]> | Game[]>(
@@ -342,7 +341,6 @@ export class GameService {
           params: {
             teamId: teamId,
             seasonYear: seasonYear,
-            preseasonWeek: preseasonWeek,
             include: 'homeTeam,awayTeam', // Try to include team relationships
           },
         }
@@ -359,7 +357,7 @@ export class GameService {
       }
     } catch (error: any) {
       console.error(
-        `❌ Failed to fetch games by season ${seasonYear} and week ${preseasonWeek}:`,
+        `❌ Failed to fetch games by season ${seasonYear} and teamId ${teamId}:`,
         error
       )
       throw error
@@ -394,6 +392,43 @@ export class GameService {
       throw error
     }
   }
+
+  async getByTeamSeasonWeek(
+    teamId?: number,
+    seasonYear?: string,
+    gameWeek?: number
+  ): Promise<Game[]> {
+    console.log(`🔍 Game Service: Fetching games by season: ${seasonYear}`)
+    try {
+      const response = await apiService.get<ApiResponse<Game[]> | Game[]>(
+        `${this.endpoint}/filter`,
+        {
+          params: {
+            teamId: teamId,
+            seasonYear: seasonYear,
+            gameWeek: gameWeek,
+            include: 'homeTeam,awayTeam', // Try to include team relationships
+          },
+        }
+      )
+
+      // Handle both wrapped and direct responses
+      if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+        const wrappedResponse = response.data as ApiResponse<Game[]>
+        return wrappedResponse.data
+      } else if (Array.isArray(response.data)) {
+        return response.data as Game[]
+      } else {
+        return []
+      }
+    } catch (error: any) {
+      console.error(`❌ Failed to fetch games by season ${seasonYear}:`, error)
+      throw error
+    }
+  }
+
+//async getUpcomingGames(teamId?: number, limit?: number): Promise<Game[]> {}
+//async getCompletedGames(teamId?: number, limit?: number): Promise<Game[]> {}
 
   async create(
     data: Omit<Game, 'id' | 'homeTeam' | 'awayTeam' | 'createdAt' | 'updatedAt'>

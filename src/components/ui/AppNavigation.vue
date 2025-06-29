@@ -3,8 +3,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Menu from 'primevue/menu'
+import { useNavigation } from '@/composables/useNavigation' // or wherever it's defined
 
 const router = useRouter()
+const { goToPage } = useNavigation()
 
 const menuItems = ref([
   {
@@ -66,6 +68,27 @@ const menuItems = ref([
     label: 'Post Season Results',
     icon: 'pi pi-crown',
     command: () => router.push('/post-season-results'),
+  },
+  {
+    label: 'Draft Menu',
+    icon: 'pi pi-folder',
+    styleClass: 'green-icon',
+    items: [
+      {
+        label: 'Draft Tracker',
+        icon: 'pi pi-stopwatch',
+        styleClass: 'green-icon',
+        command: () => goToPage('draft'),
+        to: { name: 'draft' }
+      },
+      {
+        label: 'Track Draft',
+        icon: 'pi pi-stopwatch',
+        styleClass: 'green-icon',
+        command: () => ('draft-tracker'),
+        to: { name: 'draft-tracker' }
+      }
+    ]
   },
 ])
 </script>

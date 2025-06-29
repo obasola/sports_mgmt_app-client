@@ -1,7 +1,7 @@
 <template>
   <div class="pgHeader">
     <h1>
-      <img :src="getNflLogo()"  class="nfl-logo" />
+      <img :src="getNflLogo()" class="nfl-logo" />
       Season Schedule
     </h1>
     <div class="team">
@@ -21,6 +21,17 @@
           <option value="">Select Season</option>
           <option v-for="year in seasonYears" :key="year" :value="year">
             {{ year }}
+          </option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="week">Season:</label>
+        <select id="week" v-model="selectedWeek" class="schedule-select" @change="loadSchedule">
+          <option value="0">Select Week</option>
+          <option value="99">Preseason</option>
+          <option v-for="week in scheduleWeeks" :key="week" :value="week">
+            Week&nbsp;{{ week }}
           </option>
         </select>
       </div>
@@ -210,6 +221,8 @@ const teamStore = useTeamStore()
 const toast = useToast()
 // Reactive data
 const selectedSeason = ref('2025')
+const selectedWeek = ref(1);
+
 const selectedTeam = ref('')
 const loading = ref(false)
 const error = ref('')
@@ -224,6 +237,15 @@ const seasonYears = computed(() => {
     years.push(year.toString())
   }
   return years
+})
+
+// Computed schedule weeks
+const scheduleWeeks = computed(() => {
+  const weeks = []
+  for (let week = 1; week <= 18; week++) {
+    weeks.push(week.toString())
+  }
+  return weeks
 })
 
 // Game status options for editing
@@ -391,14 +413,39 @@ const scheduleGames = computed(() => {
 
 // Methods
 const loadSchedule = async () => {
-  if (!selectedSeason.value || !selectedTeam.value) return
+  if (!selectedSeason.value || !selectedTeam.value || !selectedWeek.value) return
+
+  if (selectedWeek.value >= 1 && selectedWeek.value <= 18) {
+    return loadScheduleByWeek();
+  }
+  loading.value = true
+  error.value = ''
+
+  try {
+    console.log("Query for Week: "+selectedWeek.value)
+    if (Number(selectedWeek.value) === 99) {
+      await gameStore.fetchPreSeasonGames(Number(selectedTeam.value), selectedSeason.value)
+    } else {
+      // Load all games for the selected season
+      await gameStore.fetchAll(1, 1000, true)
+    }
+  } catch (err) {
+    error.value = 'Failed to load schedule data'
+    console.error('Schedule load error:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const loadScheduleByWeek = async () => {
+  if (!selectedWeek.value || !selectedWeek.value) return
 
   loading.value = true
   error.value = ''
 
   try {
     // Load all games for the selected season
-    await gameStore.fetchAll(1, 1000, true)
+    await gameStore.fetchTeamSeasonWeekGames(Number(selectedTeam.value), selectedSeason.value, Number(selectedWeek.value))
   } catch (err) {
     error.value = 'Failed to load schedule data'
     console.error('Schedule load error:', err)
@@ -594,6 +641,7 @@ onMounted(() => {
   object-fit: contain;
   vertical-align: middle;
 }
+
 .schedule-container {
   width: 100%;
 }

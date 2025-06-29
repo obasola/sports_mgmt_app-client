@@ -1,4 +1,4 @@
-import { gameService } from '@/services/gameService';
+import { gameService } from '@/services/gameService'
 // src/stores/gameStore.ts
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
@@ -11,7 +11,7 @@ export const useGameStore = defineStore('game', () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
   const mode = ref<CrudMode>('read')
-  
+
   // Pagination state
   const pagination = ref<PaginationMeta | null>(null)
   const currentPage = ref(1)
@@ -19,7 +19,7 @@ export const useGameStore = defineStore('game', () => {
 
   // Getters
   const getGameById = computed(() => {
-    return (id: number) => games.value.find((item) => item.id === id)
+    return (id: number) => games.value.find(item => item.id === id)
   })
 
   // Actions - All data from REST API with pagination support
@@ -33,11 +33,11 @@ export const useGameStore = defineStore('game', () => {
     console.log(`🔍 Game Store: Fetching games page ${page}, limit ${limit}, refresh: ${refresh}`)
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await gameService.getAll(page, limit)
       console.log(`🔍 Game Store: Received ${response.data.length} games`)
-      
+
       if (page === 1 || refresh) {
         // Replace data for first page or refresh
         games.value = response.data
@@ -47,16 +47,16 @@ export const useGameStore = defineStore('game', () => {
         games.value = [...games.value, ...response.data]
         console.log(`🔍 Game Store: Appended games data, total now: ${games.value.length}`)
       }
-      
+
       pagination.value = response.pagination
       currentPage.value = page
       itemsPerPage.value = limit
-      
+
       console.log(`🔍 Game Store: Updated pagination state:`, {
         currentPage: currentPage.value,
         itemsPerPage: itemsPerPage.value,
         total: pagination.value?.total || 0,
-        pages: pagination.value?.pages || 0
+        pages: pagination.value?.pages || 0,
       })
 
       // Check if we're using client-side pagination fallback
@@ -66,11 +66,10 @@ export const useGameStore = defineStore('game', () => {
           console.log('🔍 Game Store: Using client-side pagination fallback')
         }
       }
-      
     } catch (err: any) {
       let errorMessage = 'Failed to fetch games from server'
       console.error('❌ Game Store:', errorMessage, err)
-      
+
       // Enhanced error handling based on error type
       if (err.response?.status === 400) {
         errorMessage = 'Games API configuration issue (400) - check server logs'
@@ -83,7 +82,7 @@ export const useGameStore = defineStore('game', () => {
       } else if (err.message?.includes('Invalid response structure')) {
         errorMessage = 'API response format error - check backend structure'
       }
-      
+
       error.value = errorMessage
       throw err
     } finally {
@@ -104,12 +103,12 @@ export const useGameStore = defineStore('game', () => {
     error.value = null
     try {
       currentGame.value = await gameService.getById(id)
-      
-      const index = games.value.findIndex((item) => item.id === id)
+
+      const index = games.value.findIndex(item => item.id === id)
       if (index !== -1 && currentGame.value) {
         games.value[index] = currentGame.value
       }
-      
+
       return currentGame.value
     } catch (err) {
       error.value = 'Failed to fetch game from server'
@@ -122,38 +121,51 @@ export const useGameStore = defineStore('game', () => {
 
   const fetchAllGamesForSeason = async (teamId: number, seasonYear?: string) => {
     try {
-      const games = await gameService.getRegularSeasonGames(teamId,seasonYear);
-      return games;
+      const games = await gameService.getRegularSeasonGames(teamId, seasonYear)
+      return games
     } catch (error) {
-      console.log("Error: "+ error);
+      console.log('Error: ' + error)
+    }
+  }
+
+  const fetchTeamSeasonWeekGames = async (teamId: number, seasonYear?: string, gameWeek?: number) => {
+    try {
+      const games = await gameService.getByTeamSeasonWeek(teamId, seasonYear, gameWeek)
+      return games
+    } catch (error) {
+      console.log('Error: ' + error)
     }
   }
 
   const fetchRegularSeasonGames = async (teamId: number, seasonYear?: string) => {
     try {
-      const games = await gameService.getRegularSeasonGames(teamId,seasonYear);
-      return games;
+      const games = await gameService.getRegularSeasonGames(teamId, seasonYear)
+      return games
     } catch (error) {
-      console.log("Error: "+ error);
+      console.log('Error: ' + error)
     }
   }
 
-  const fetchPreSeasonGames = async (teamId: number, seasonYear?: string, preseasonWeek?: string) => {
+  const fetchPreSeasonGames = async (
+    teamId: number,
+    seasonYear?: string
+  ) => {
     try {
-      let searchYear: number = parseInt(seasonYear ? seasonYear : '0');
-      let searchWeek: number = parseInt(preseasonWeek ? preseasonWeek : '0');
-      const games = await gameService.getPreseasonGames(teamId,searchYear,searchWeek);
-      return games;
+      let searchYear: number = parseInt(seasonYear ? seasonYear : '0')
+      const games = await gameService.getPreseasonGames(teamId, searchYear)
+      return games
     } catch (error) {
-      console.log("Error: "+ error);
+      console.log('Error: ' + error)
     }
   }
 
-  const create = async (data: Omit<Game, 'id' | 'homeTeam' | 'awayTeam' | 'createdAt' | 'updatedAt'>) => {
+  const create = async (
+    data: Omit<Game, 'id' | 'homeTeam' | 'awayTeam' | 'createdAt' | 'updatedAt'>
+  ) => {
     loading.value = true
     error.value = null
     try {
-      console.log("Calling clientside - gameService.create")
+      console.log('Calling clientside - gameService.create')
       const newGame = await gameService.create(data)
       games.value.push(newGame)
       currentGame.value = newGame
@@ -167,12 +179,15 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  const update = async (id: number, data: Partial<Omit<Game, 'id' | 'homeTeam' | 'awayTeam' | 'createdAt' | 'updatedAt'>>) => {
+  const update = async (
+    id: number,
+    data: Partial<Omit<Game, 'id' | 'homeTeam' | 'awayTeam' | 'createdAt' | 'updatedAt'>>
+  ) => {
     loading.value = true
     error.value = null
     try {
       const updatedGame = await gameService.update(id, data)
-      const index = games.value.findIndex((item) => item.id === id)
+      const index = games.value.findIndex(item => item.id === id)
       if (index !== -1) {
         games.value[index] = updatedGame
       }
@@ -192,7 +207,7 @@ export const useGameStore = defineStore('game', () => {
     error.value = null
     try {
       await gameService.delete(id)
-      games.value = games.value.filter((item) => item.id !== id)
+      games.value = games.value.filter(item => item.id !== id)
       if (currentGame.value?.id === id) {
         currentGame.value = null
       }
@@ -221,7 +236,6 @@ export const useGameStore = defineStore('game', () => {
     return fetchAll(page, limit, true)
   }
 
-  
   return {
     // State
     games,
@@ -232,12 +246,13 @@ export const useGameStore = defineStore('game', () => {
     pagination,
     currentPage,
     itemsPerPage,
-    // Getters  
+    // Getters
     getGameById,
     // Actions
     fetchAll,
     fetchById,
     fetchRegularSeasonGames,
+    fetchTeamSeasonWeekGames,
     fetchPreSeasonGames,
     fetchAllGamesForSeason,
     create,
